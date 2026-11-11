@@ -1,0 +1,973 @@
+---
+pagetitle: "O retrato da violência contra crianças e adolescentes no Brasil"
+lang: pt-BR
+format:
+  html:
+    embed-resources: true
+    smooth-scroll: true
+    include-in-header:
+      text: |
+        <style>
+        :root{
+          --coral:#FF481F; --azul:#6588B1; --verde:#447463; --laranja:#FB913C;
+          --tinta:#1F2430; --fundo:#FAF8F5; --cinza:#6B7280; --linha:#E7E2DA;
+          --fonte:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+        }
+        html{scroll-behavior:smooth}
+        body{background:var(--fundo); color:var(--tinta); font-family:var(--fonte); margin:0}
+        /* o scrolltelling ocupa a tela toda, sem a coluna de artigo padrão do Quarto */
+        #quarto-content,.page-columns.page-rows-contents.page-layout-article{
+          display:block!important; max-width:none!important; width:100%!important; padding:0!important; margin:0!important}
+        .page-columns.page-rows-contents.page-layout-article>.content{
+          max-width:none!important; width:100%!important; padding:0!important; margin:0!important}
+        /* barra de progresso */
+        .progresso{position:fixed; top:0; left:0; right:0; height:3px; background:transparent; z-index:100}
+        .progresso__barra{height:100%; width:0; background:var(--coral)}
+        /* estrutura scrolly */
+        .scrolly{display:grid; grid-template-columns:minmax(360px,44%) 1fr; max-width:1480px; margin:0 auto}
+        .texto-col{position:relative; z-index:1}
+        .grafico-col{position:sticky; top:0; height:100vh; align-self:start; z-index:10;
+          background:var(--fundo); border-left:1px solid var(--linha); padding:26px 30px 18px 30px; box-sizing:border-box}
+        .grafico-head{display:flex; justify-content:space-between; align-items:baseline;
+          font-size:12px; letter-spacing:.12em; text-transform:uppercase; color:var(--cinza); margin-bottom:8px}
+        .grafico-col__inner{position:relative; height:calc(100% - 26px)}
+        .cena{position:absolute; inset:0; display:flex; flex-direction:column; opacity:0;
+          visibility:hidden; transition:opacity .45s ease, visibility .45s}
+        .cena.ativa{opacity:1; visibility:visible}
+        .cena__chart{position:relative; flex:1; min-height:0}
+        .cena__chart>.cell{position:absolute; inset:0; width:100%; height:100%; margin:0; padding:0}
+        .cena__chart>.cell>.cell-output-display{position:relative; width:100%; height:100%; margin:0}
+        .cena__chart .html-widget{position:absolute!important; inset:0; width:100%!important; height:100%!important}
+        .cena__caption{font-size:11px; color:var(--cinza); padding-top:8px; line-height:1.4}
+        .grafico-linhas-facetas h3{margin:0; text-align:center; font-size:15px; font-weight:700; padding:2px 0 4px 0}
+        /* passos */
+        .step{min-height:92vh; display:flex; align-items:center; padding:5vh 44px; box-sizing:border-box}
+        .step__inner{background:rgba(255,255,255,.94); border:1px solid var(--linha); border-top:3px solid var(--coral);
+          border-radius:10px; padding:26px 30px; box-shadow:0 10px 30px rgba(31,36,48,.07); max-width:560px}
+        .step__eyebrow{font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--coral); font-weight:700; margin:0 0 8px 0}
+        .step h2{margin:0 0 12px 0; font-size:26px; line-height:1.25}
+        .step p{font-size:15.5px; line-height:1.65; margin:0 0 12px 0}
+        .hl{color:var(--coral); font-weight:700}
+        .azul{color:var(--azul); font-weight:700}
+        .stat{display:block; margin:14px 0; padding:12px 16px; background:#FFF3EF; border-left:3px solid var(--coral);
+          border-radius:0 8px 8px 0; font-size:20px; font-weight:800; line-height:1.3}
+        .stat small{display:block; font-size:12px; font-weight:500; color:var(--cinza); margin-top:2px}
+        /* capa e encerramento */
+        .hero{min-height:100vh; display:flex; flex-direction:column; justify-content:center; align-items:flex-start;
+          max-width:1480px; margin:0 auto; padding:8vh 44px; box-sizing:border-box; overflow:hidden}
+        .hero>*{width:100%; box-sizing:border-box; max-width:100%}
+        .hero__marca{font-size:12px; letter-spacing:.16em; text-transform:uppercase; color:var(--azul); font-weight:700; margin-bottom:18px}
+        .hero h1{font-size:clamp(34px,4.6vw,58px); line-height:1.08; margin:0 0 18px 0; max-width:15ch}
+        .hero__lead{font-size:18px; line-height:1.6; color:#3A4152; max-width:62ch; margin:0 0 34px 0}
+        .hero__cartoes{display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:14px; width:100%; max-width:1000px}
+        .cartao{background:#fff; border:1px solid var(--linha); border-radius:10px; padding:18px 20px; box-shadow:0 6px 18px rgba(31,36,48,.05)}
+        .cartao b{display:block; font-size:26px; color:var(--coral); line-height:1.1}
+        .cartao span{font-size:12.5px; color:var(--cinza); line-height:1.4; display:block; margin-top:6px}
+        .hero__dica{margin-top:40px; font-size:13px; color:var(--cinza); animation:pulsar 2s infinite}
+        @keyframes pulsar{0%,100%{opacity:.45}50%{opacity:1}}
+        .fim{max-width:920px; margin:0 auto; padding:10vh 44px 14vh 44px}
+        .fim h2{font-size:30px; margin:0 0 18px 0}
+        .fim li{font-size:15.5px; line-height:1.65; margin-bottom:10px}
+        .fim .fontes{font-size:12.5px; color:var(--cinza); line-height:1.7; border-top:1px solid var(--linha); margin-top:30px; padding-top:18px}
+        @media (prefers-reduced-motion: reduce){
+          .cena{transition:none} .hero__dica{animation:none}
+        }
+        @media (max-width:900px){
+          .scrolly{display:flex; flex-direction:column}
+          .grafico-col{order:-1; height:46vh; padding:14px 16px 10px 16px; border-left:none; border-bottom:1px solid var(--linha)}
+          .texto-col{position:relative}
+          .step{min-height:80vh; padding:4vh 20px}
+          .step__inner{max-width:none; padding:20px}
+          .hero{padding:10vh 22px}
+          .fim{padding:8vh 22px 12vh 22px}
+        }
+        </style>
+execute:
+  echo: false
+  warning: false
+  message: false
+  cache: false
+---
+
+```{r setup}
+suppressMessages({
+  library(tidyverse)
+  library(scales)
+  library(echarts4r)
+  library(htmlwidgets)
+  library(sf)
+  library(viridisLite)
+  library(jsonlite)
+})
+
+# Reutiliza as funções de gráfico do painel (carrega config.R internamente).
+source("../funcoes_graf.r", chdir = TRUE)
+
+# Dados do painel
+load("../tabelas/sinan.rda")
+load("../justica/processos_df.rda")
+load("../conselhos_tutelares/cons_tut.rda")
+load("../tabelas/sih_viol_sexual")
+load("../tabelas/viol_sexual_ca_sia_pa.rda")
+
+fmt_int <- function(x) format(round(x), big.mark = ".", decimal.mark = ",")
+fmt_mi  <- function(x) sub("\\.", ",", format(round(x / 1e6, 1), nsmall = 1))
+fmt_mil <- function(x) format(round(x / 1e3), big.mark = ".", decimal.mark = ",")
+fmt_pct <- function(x, d = 1) paste0(sub("\\.", ",", format(round(100 * x, d), nsmall = d)), "%")
+
+# ---- Números centrais da narrativa --------------------------------------
+tot_sinan   <- sum(sinan$n)
+sinan_ano   <- sinan |>
+  mutate(ano = year(data_notific)) |>
+  summarise(n = sum(n), .by = ano)
+
+ca <- sinan |>
+  filter(ciclo_vida %in% c("Criança", "Adolescente"))
+tot_ca <- sum(ca$n)
+tot_criancas <- sum(ca$n[ca$ciclo_vida == "Criança"])
+tot_adolescentes <- sum(ca$n[ca$ciclo_vida == "Adolescente"])
+
+ca_ano <- ca |>
+  mutate(ano = year(data_notific)) |>
+  summarise(n = sum(n), .by = c(ano, ciclo_vida))
+
+motivos_det <- ca |>
+  filter(!is.na(motivo_violencia),
+         motivo_violencia != "Não detalhado / sem informação") |>
+  summarise(n = sum(n), .by = motivo_violencia) |>
+  arrange(desc(n))
+pct_sem_detalhe <- ca |>
+  filter(is.na(motivo_violencia) |
+         motivo_violencia == "Não detalhado / sem informação") |>
+  summarise(n = sum(n)) |> pull(n) / tot_ca
+
+familiares <- c("Pai", "Mãe", "Padrasto", "Madrasta", "Filho(a)", "Irmão(ã)")
+autores_ca <- ca |>
+  filter(!is.na(autor), autor != "Não informado") |>
+  summarise(n = sum(n), .by = autor) |>
+  arrange(desc(n))
+n_familiares <- autores_ca |> filter(autor %in% familiares) |> summarise(n = sum(n)) |> pull(n)
+
+sexo_vitimas <- ca |>
+  mutate(genero_vitima = coalesce(genero_vitima, "Ignorado")) |>
+  summarise(n = sum(n), .by = genero_vitima) |>
+  arrange(desc(n))
+pct_ca_f <- sum(sexo_vitimas$n[sexo_vitimas$genero_vitima == "Feminino"]) / tot_ca
+
+# Violência sexual - SIA/SUS (ambulatório)
+sia <- viol_sexual_ca_sia_pa |>
+  filter(competencia >= ym("201501")) |>
+  mutate(
+    raca = raca_cor,
+    ano = year(competencia)
+  )
+tot_sia <- sum(sia$n)
+pct_sia_f <- sia |> summarise(n = sum(n), .by = genero) |>
+  mutate(p = n / sum(n)) |> filter(genero == "F") |> pull(p)
+sia_pico <- sia |> filter(genero == "F") |>
+  summarise(n = sum(n), .by = idade) |> slice_max(n, n = 1, with_ties = FALSE)
+pct_sia_0_9 <- sum(sia$n[sia$idade <= 9]) / tot_sia
+pct_sia_parda <- sia |> summarise(n = sum(n), .by = raca) |>
+  mutate(p = n / sum(n)) |> filter(raca == "Parda") |> pull(p)
+ano_sia_inicial <- year(min(sia$competencia)) + as.integer(month(min(sia$competencia)) > 1)
+ano_sia_completo <- year(max(sia$competencia)) - as.integer(month(max(sia$competencia)) < 12)
+sia_ano_tot <- sia |> filter(ano >= ano_sia_inicial, ano <= ano_sia_completo) |>
+  summarise(n = sum(n), .by = ano) |> arrange(ano)
+sia_racas <- sia |> summarise(n = sum(n), .by = raca) |> arrange(desc(n))
+
+# Violência sexual - SIH/SUS (internações)
+sih_ca <- sih_viol_sexual |>
+  mutate(dt = competencia) |>
+  filter(!is.na(dt), !is.na(idade), idade >= 0, idade <= 17)
+tot_sih <- sum(sih_ca$n)
+pct_sih_f <- sum(sih_ca$n[sih_ca$genero == "3"]) / tot_sih
+mediana_sih <- median(rep(sih_ca$idade, sih_ca$n))
+ano_sih_inicial <- year(min(sih_ca$dt)) + as.integer(month(min(sih_ca$dt)) > 1)
+ano_sih_completo <- year(max(sih_ca$dt)) - as.integer(month(max(sih_ca$dt)) < 12)
+sih_ano <- sih_ca |> mutate(ano = year(dt)) |>
+  summarise(n = sum(n), .by = ano) |> arrange(ano)
+sih_pico <- sih_ano |> filter(ano >= ano_sih_inicial, ano <= ano_sih_completo) |>
+  slice_max(n, n = 1, with_ties = FALSE)
+
+# Justiça - CNJ
+proc <- processos_df |>
+  mutate(dt = ymd(str_sub(data_ajuizamento, 1, 8)), ano = year(dt)) |>
+  filter(!is.na(dt), ano <= 2026)
+tot_proc <- n_distinct(proc$numero_processo)
+tot_eca <- proc |>
+  filter(str_detect(assunto_nome, "Estatuto da criança|Estatuto da Criança|ECA")) |>
+  summarise(n = n_distinct(numero_processo)) |> pull(n)
+cnj_ano <- proc |> distinct(ano, numero_processo) |> summarise(n = n(), .by = ano)
+assuntos_top <- proc |>
+  select(numero_processo, assunto_nome) |>
+  filter(!is.na(assunto_nome)) |>
+  separate_longer_delim(assunto_nome, delim = ";") |>
+  mutate(assunto = str_squish(assunto_nome)) |>
+  filter(assunto != "") |>
+  distinct(numero_processo, assunto) |>
+  count(assunto, name = "n", sort = TRUE) |>
+  head(8)
+
+tot_ct <- sum(cons_tut$num_ct)
+mun_sem_ct <- sum(cons_tut$num_ct == 0, na.rm = TRUE)
+
+# Períodos e destaques acompanham o conteúdo das tabelas.
+periodo_anos <- function(x) paste(range(year(x), na.rm = TRUE), collapse = "–")
+periodo_meses <- function(x) paste(format(range(x, na.rm = TRUE), "%m/%Y"), collapse = "–")
+periodo_sinan <- periodo_anos(sinan$data_notific)
+periodo_sia <- periodo_meses(sia$competencia)
+periodo_sih <- periodo_meses(sih_ca$dt)
+periodo_cnj <- periodo_meses(proc$dt)
+sinan_pico <- sinan_ano |> slice_max(n, n = 1, with_ties = FALSE)
+ca_ano_tot <- ca_ano |> summarise(n = sum(n), .by = ano) |> arrange(ano)
+ano_cnj_inicial <- year(min(proc$dt)) + as.integer(month(min(proc$dt)) > 1)
+ano_cnj_completo <- year(max(proc$dt)) - as.integer(month(max(proc$dt)) < 12)
+cnj_pico <- cnj_ano |> filter(ano >= ano_cnj_inicial, ano <= ano_cnj_completo) |>
+  slice_max(n, n = 1, with_ties = FALSE)
+var_sinan_2020 <- sinan_ano$n[sinan_ano$ano == 2020] / sinan_ano$n[sinan_ano$ano == 2019] - 1
+var_cnj_2020 <- cnj_ano$n[cnj_ano$ano == 2020] / cnj_ano$n[cnj_ano$ano == 2019] - 1
+pct_sexismo_f <- ca |> filter(motivo_violencia == "Sexismo") |>
+  summarise(p = sum(n[genero_vitima == "Feminino"], na.rm = TRUE) / sum(n)) |> pull(p)
+```
+
+::: {.hero data-cena="-1"}
+
+<p class="hero__marca">DataSenado · Painel de Violência Interpessoal e Autoprovocada</p>
+
+# O retrato da violência contra crianças e adolescentes no Brasil
+
+<p class="hero__lead">Uma viagem guiada pelos dados oficiais — Sinan, SIA, SIH, CNJ e MUNIC/IBGE — sobre a violência que atinge quem tem até 17 anos. As cinco bases permitem acompanhar os registros de violência, o atendimento na saúde, os processos judiciais e a distribuição dos conselhos tutelares.</p>
+
+<div class="hero__cartoes">
+<div class="cartao"><b>`r fmt_mi(tot_sinan)` milhões</b><span>notificações de violência contra crianças e adolescentes no Sinan, `r periodo_sinan`</span></div>
+<div class="cartao"><b>`r fmt_mil(tot_sia)` mil</b><span>registros ambulatoriais por violência sexual em crianças e adolescentes (SIA/SUS), `r periodo_sia`</span></div>
+<div class="cartao"><b>`r fmt_mil(tot_sih)` mil</b><span>registros hospitalares por violência sexual em crianças e adolescentes (SIH/SUS), `r periodo_sih`</span></div>
+<div class="cartao"><b>`r fmt_mil(tot_proc)` mil</b><span>processos na Justiça estadual de 1º grau com temas ligados a crianças e adolescentes (CNJ), `r periodo_cnj`</span></div>
+</div>
+
+<p class="hero__dica">↓ role para começar a história</p>
+
+:::
+
+::: {.scrolly}
+
+::: {.texto-col}
+
+::: {.step data-cena="0"}
+::: {.step__inner}
+<p class="step__eyebrow">O panorama</p>
+## `r fmt_mi(tot_sinan)` milhões de notificações
+
+No período `r periodo_sinan`, o Sistema de Informação de Agravos de Notificação (Sinan) reúne <span class="hl">`r fmt_int(tot_sinan)` registros</span> de violência interpessoal e autoprovocada envolvendo crianças e adolescentes.
+
+O maior total anual da série disponível aparece em <span class="hl">`r sinan_pico$ano`</span>, com <span class="hl">`r fmt_int(sinan_pico$n)` notificações</span>. A variação dos registros pode refletir mudanças na ocorrência, na detecção e na notificação da violência.
+
+<span class="stat">`r fmt_pct(var_sinan_2020)` em 2020<small>variação das notificações em relação a 2019; a queda dos registros não permite concluir que houve menos violência</small></span>
+:::
+:::
+
+::: {.step data-cena="1"}
+::: {.step__inner}
+<p class="step__eyebrow">As vítimas</p>
+## Crianças e adolescentes no centro do retrato
+
+A tabela reúne <span class="hl">`r fmt_int(tot_criancas)` notificações envolvendo crianças</span> e <span class="hl">`r fmt_int(tot_adolescentes)` envolvendo adolescentes</span>. A classificação considera crianças de 0 a 11 anos e adolescentes de 12 a 17 anos.
+
+No último ano disponível, `r max(ca_ano_tot$ano)`, foram <span class="hl">`r fmt_int(tail(ca_ano_tot$n, 1))` registros</span> envolvendo esses grupos.
+
+<span class="stat">`r fmt_pct(tot_criancas/tot_ca)` envolvendo crianças<small>participação de vítimas de 0 a 11 anos no recorte de crianças e adolescentes</small></span>
+:::
+:::
+
+::: {.step data-cena="2"}
+::: {.step__inner}
+<p class="step__eyebrow">Os motivos</p>
+## O que aparece quando o motivo é detalhado
+
+Os registros com motivação ausente ou agrupada como "Não detalhado / sem informação" representam <span class="hl">`r fmt_pct(pct_sem_detalhe)` dos casos</span>. Esse agrupamento reúne as respostas "Outros", "Não se aplica" e "Ignorado", além dos valores ausentes.
+
+Entre os motivos detalhados, <span class="hl">`r motivos_det$motivo_violencia[1]`</span> (`r fmt_int(motivos_det$n[1])` notificações) e <span class="hl">`r motivos_det$motivo_violencia[2]`</span> (`r fmt_int(motivos_det$n[2])`) são os mais frequentes. O campo descreve a motivação registrada, e não o tipo de violência.
+
+<span class="stat">`r fmt_pct(pct_sexismo_f)` no sexo feminino<small>participação nas notificações de sexismo envolvendo crianças e adolescentes</small></span>
+:::
+:::
+
+::: {.step data-cena="3"}
+::: {.step__inner}
+<p class="step__eyebrow">Os agressores</p>
+## Quem aparece como autor
+
+Entre os vínculos registrados, aparecem a <span class="azul">própria pessoa</span> (`r fmt_int(sum(autores_ca$n[autores_ca$autor == "Própria pessoa"]))` notificações), a <span class="hl">mãe</span> (`r fmt_int(sum(autores_ca$n[autores_ca$autor == "Mãe"]))`) e o <span class="hl">pai</span> (`r fmt_int(sum(autores_ca$n[autores_ca$autor == "Pai"]))`).
+
+Somando pais, mães, padrastos, madrastas, filhos e irmãos, os registros com um único vínculo familiar assinalado representam <span class="hl">`r fmt_pct(n_familiares/tot_ca)` das notificações</span> de crianças e adolescentes.
+
+<span class="stat">`r fmt_int(sum(autores_ca$n[autores_ca$autor == "Múltiplas relações"]))` registros com múltiplas relações<small>cada notificação permanece em uma única categoria; vínculos múltiplos podem incluir familiares e não entram no subtotal familiar</small></span>
+:::
+:::
+
+::: {.step data-cena="4"}
+::: {.step__inner}
+<p class="step__eyebrow">Vítimas e autores</p>
+## O cruzamento entre vítima e autor
+
+O mapa de calor cruza o ciclo de vida da vítima com o do principal provável autor informado na ficha. A diagonal identifica registros com vítima e autor no mesmo ciclo de vida; as demais células mostram combinações entre faixas diferentes.
+
+Os rótulos "ignorado" e "não informado" preservam as lacunas de preenchimento. O cruzamento permite observar o perfil etário, mas não identifica, por si só, o local da violência nem o vínculo familiar.
+
+<span class="stat">vítima × provável autor<small>o perfil do autor depende das informações registradas na notificação</small></span>
+:::
+:::
+
+::: {.step data-cena="5"}
+::: {.step__inner}
+<p class="step__eyebrow">O perfil das vítimas</p>
+## A distribuição por sexo registrado
+
+O sexo feminino aparece em <span class="hl">`r fmt_pct(pct_ca_f)` das notificações</span> de crianças e adolescentes. O gráfico mostra as frequências do sexo feminino, masculino e dos registros sem informação.
+
+Essas categorias correspondem ao sexo registrado na ficha. Elas não medem identidade de gênero nem representam pessoas únicas: uma pessoa pode aparecer em mais de uma notificação.
+
+<span class="stat">`r fmt_int(tot_ca)` notificações<small>as categorias descrevem o sexo registrado nas fichas, sem identificar pessoas únicas</small></span>
+:::
+:::
+
+::: {.step data-cena="6"}
+::: {.step__inner}
+<p class="step__eyebrow">Violência sexual</p>
+## O pico está aos `r sia_pico$idade` anos
+
+Na rede ambulatorial do SUS (SIA), foram <span class="hl">`r fmt_mil(tot_sia)` mil registros ambulatoriais de crianças e adolescentes por violência sexual</span> no período `r periodo_sia`.
+
+Meninas concentram <span class="hl">`r fmt_pct(pct_sia_f)` dos registros</span>. A maior frequência entre os registros femininos aparece aos <span class="hl">`r sia_pico$idade` anos</span>, com `r fmt_int(sia_pico$n)` registros nessa idade.
+
+<span class="stat">`r fmt_pct(pct_sia_0_9)` dos registros até 9 anos<small>participação dessa faixa etária na produção ambulatorial selecionada</small></span>
+:::
+:::
+
+::: {.step data-cena="7"}
+::: {.step__inner}
+<p class="step__eyebrow">O perfil do atendimento</p>
+## A evolução dos registros por raça/cor
+
+Nos anos completos disponíveis, a produção ambulatorial selecionada passou de <span class="azul">`r fmt_int(head(sia_ano_tot$n, 1))` registros em `r min(sia_ano_tot$ano)`</span> para <span class="hl">`r fmt_int(tail(sia_ano_tot$n, 1))` em `r max(sia_ano_tot$ano)`</span>.
+
+No recorte por raça/cor, a categoria <span class="hl">`r sia_racas$raca[1]`</span> tem a maior frequência. Pardas correspondem a <span class="hl">`r fmt_pct(pct_sia_parda)` dos registros</span>. O gráfico preserva os rótulos da tabela preparada.
+
+<span class="stat">comparação de anos completos<small>o ano mais recente é excluído deste gráfico quando a tabela termina antes de dezembro</small></span>
+:::
+:::
+
+::: {.step data-cena="8"}
+::: {.step__inner}
+<p class="step__eyebrow">Hospitalizações</p>
+## Quando a violência leva ao hospital
+
+A tabela do SIH reúne <span class="hl">`r fmt_int(tot_sih)` registros hospitalares de crianças e adolescentes</span> por violência sexual no período `r periodo_sih`. O recorte já contém somente idades de 0 a 17 anos.
+
+O sexo feminino corresponde a <span class="hl">`r fmt_pct(pct_sih_f)` dos registros</span>. A idade mediana, ponderada pela frequência de cada grupo, é de <span class="hl">`r mediana_sih` anos</span>.
+
+<span class="stat">`r fmt_int(sih_pico$n)` registros em `r sih_pico$ano`<small>maior total entre os anos completos disponíveis; a unidade é o registro hospitalar, não a pessoa única</small></span>
+:::
+:::
+
+::: {.step data-cena="9"}
+::: {.step__inner}
+<p class="step__eyebrow">A Justiça</p>
+## `r fmt_mil(tot_proc)` mil processos na série disponível
+
+Na Justiça estadual de 1º grau, foram <span class="hl">`r fmt_int(tot_proc)` processos</span> ajuizados no período `r periodo_cnj` com temas ligados a crianças e adolescentes. Desse total, <span class="hl">`r fmt_int(tot_eca)` (`r fmt_pct(tot_eca/tot_proc)`)</span> têm assunto relacionado ao Estatuto da Criança e do Adolescente.
+
+Entre os anos completos disponíveis, o maior volume aparece em <span class="hl">`r cnj_pico$ano`</span>, com <span class="hl">`r fmt_int(cnj_pico$n)` processos</span>.
+
+<span class="stat">`r fmt_pct(var_cnj_2020)` em 2020<small>variação do número de processos ajuizados em relação a 2019</small></span>
+:::
+:::
+
+::: {.step data-cena="10"}
+::: {.step__inner}
+<p class="step__eyebrow">Os assuntos</p>
+## Os assuntos mais frequentes
+
+O assunto mais frequente é <span class="hl">`r assuntos_top$assunto[1]`</span>, associado a <span class="hl">`r fmt_int(assuntos_top$n[1])` processos</span>.
+
+O ranking reúne os assuntos registrados nos processos selecionados. Um mesmo processo pode estar associado a mais de um assunto e aparecer em mais de uma barra.
+
+<span class="stat">processos únicos por assunto<small>cada combinação de número de processo e assunto é contada uma vez</small></span>
+:::
+:::
+
+::: {.step data-cena="11"}
+::: {.step__inner}
+<p class="step__eyebrow">Duas curvas</p>
+## Saúde e Justiça em séries distintas
+
+O gráfico coloca lado a lado os totais mensais de processos judiciais e notificações de violência. As fontes têm unidades de contagem e períodos de cobertura diferentes: processos não correspondem diretamente às notificações do Sinan.
+
+A comparação permite observar tendências ao longo do tempo. Ela não estabelece que uma notificação gerou um processo, nem mede correlação ou defasagem entre as séries.
+
+<span class="stat">duas fontes, duas unidades<small>notificações podem envolver a mesma pessoa em momentos diferentes; processos são contados por número único em cada mês</small></span>
+:::
+:::
+
+::: {.step data-cena="12"}
+::: {.step__inner}
+<p class="step__eyebrow">A proteção</p>
+## Conselhos tutelares: o olho do território
+
+Em 2023, o país tinha <span class="hl">`r fmt_int(tot_ct)` conselhos tutelares</span> na base de `r fmt_int(nrow(cons_tut))` municípios — <span class="hl">`r mun_sem_ct` com valor zero</span>. Na preparação, respostas sem informação também foram convertidas para zero, por isso esse grupo não comprova ausência de conselho.
+
+A cobertura é apresentada em conselhos por 100 mil crianças e adolescentes, usando a população do Censo de 2022. O mapa agrupa os valores positivos em quintis e mantém o valor zero em categoria separada.
+
+<span class="stat">o primeiro canal de denúncia<small>conselhos tutelares são porta de entrada das crianças e adolescentes no sistema de garantia de direitos</small></span>
+:::
+:::
+
+:::
+
+::: {.grafico-col}
+<div class="grafico-head"><span>Painel de Violência Interpessoal e Autoprovocada</span><span id="contador">—</span></div>
+::: {.grafico-col__inner}
+
+::: {.cena data-cena="0"}
+::: {.cena__chart}
+```{r cena-0}
+cena0 <- sinan_ano |>
+  grafico_linha(
+    ano, n,
+    titulo = "Notificações de violência no Sinan",
+    subtitulo = paste("Brasil,", periodo_sinan, "· crianças e adolescentes"),
+    nome_y = "Notificações",
+    legenda = "none",
+    cores = c("Notificações" = "#6588B1")
+  )
+cena0$x$opts$series[[1]]$markLine <- list(
+  symbol = "none",
+  lineStyle = list(color = "#FF481F", type = "dashed", width = 1.5),
+  label = list(show = TRUE, position = "insideEndTop", color = "#FF481F", fontSize = 11,
+               formatter = "pandemia"),
+  data = list(list(xAxis = 2020))
+)
+cena0$x$opts$series[[1]]$markPoint <- list(
+  symbol = "circle", symbolSize = 7,
+  label = list(show = TRUE, position = "top", color = "#1F2430", fontSize = 11,
+               formatter = paste0("maior total: ", fmt_mil(sinan_pico$n), " mil")),
+  itemStyle = list(color = "#FF481F"),
+  data = list(list(coord = list(sinan_pico$ano, sinan_pico$n)))
+)
+cena0$x$opts$xAxis$axisLabel$formatter <- htmlwidgets::JS(
+  "function(v){return String(Math.round(v));}"
+)
+cena0
+```
+:::
+::: {.cena__caption}
+Fonte: Sinan/Ministério da Saúde, `r periodo_sinan`. Elaboração: DataSenado.
+:::
+:::
+
+::: {.cena data-cena="1"}
+::: {.cena__chart}
+```{r cena-1}
+cena1 <- ca_ano |>
+  grafico_linha(
+    ano, n, grupo = ciclo_vida,
+    titulo = "Notificações envolvendo crianças e adolescentes",
+    subtitulo = paste("Brasil,", periodo_sinan),
+    nome_y = "Notificações",
+    legenda = "top",
+    cores = c("Criança" = "#FF481F", "Adolescente" = "#6588B1")
+  )
+for (i in seq_along(cena1$x$opts$series)) {
+  cena1$x$opts$series[[i]]$areaStyle <- list(opacity = 0.12)
+}
+cena1
+```
+:::
+::: {.cena__caption}
+Fonte: Sinan/Ministério da Saúde, `r periodo_sinan`. Elaboração: DataSenado.
+:::
+:::
+
+::: {.cena data-cena="2"}
+::: {.cena__chart}
+```{r cena-2}
+ca |>
+  filter(!is.na(motivo_violencia),
+         motivo_violencia != "Não detalhado / sem informação") |>
+  group_by(data_notific, ciclo_vida, motivo_violencia) |>
+  summarise(n = sum(n), .groups = "drop") |>
+  grafico_linhas_facetas(
+    eixo_x = data_notific, eixo_y = n, grupo = ciclo_vida, facet = motivo_violencia,
+    colunas = 3, escala_y_livre = TRUE,
+    titulo = "Notificações de crianças e adolescentes por motivo detalhado"
+  )
+```
+:::
+::: {.cena__caption}
+Motivos detalhados em `r fmt_pct(1 - pct_sem_detalhe)` das notificações de crianças e adolescentes. Fonte: Sinan/Ministério da Saúde. Elaboração: DataSenado.
+:::
+:::
+
+::: {.cena data-cena="3"}
+::: {.cena__chart}
+```{r cena-3}
+barras_cores <- function(categorias, valores, cores, titulo, subtitulo = NULL, nome_x = NULL) {
+  dados <- tibble(cat = as.character(categorias), val = as.numeric(valores), cor = cores) |>
+    filter(!is.na(cat), !is.na(val)) |>
+    arrange(val)
+  widget_echarts(list(
+    textStyle = list(fontFamily = fonte_senado, fontSize = 12),
+    title = list(text = titulo, subtext = subtitulo, left = "center", top = 4,
+                 textStyle = list(fontSize = 14), subtextStyle = list(fontSize = 12)),
+    grid = list(left = 14, right = 70, top = 56, bottom = 30, containLabel = TRUE),
+    xAxis = list(type = "value", name = nome_x,
+                 axisLabel = list(formatter = numero_ptbr), splitLine = list(show = TRUE)),
+    yAxis = list(type = "category", data = as.list(dados$cat),
+                 axisTick = list(show = FALSE), axisLabel = list(fontSize = 11)),
+    tooltip = list(trigger = "item"),
+    series = list(list(
+      type = "bar", name = "Notificações", barWidth = "58%",
+      data = lapply(seq_len(nrow(dados)), function(i) {
+        list(value = dados$val[i], itemStyle = list(color = dados$cor[i]))
+      }),
+      label = list(show = TRUE, position = "right", fontSize = 11, color = "#333333",
+                   formatter = htmlwidgets::JS(
+                     "function(p){return Number(p.value).toLocaleString('pt-BR');}"
+                   ))
+    ))
+  ), "100%")
+}
+
+autores_top10 <- autores_ca |> head(10)
+barras_cores(
+  autores_top10$autor, autores_top10$n,
+  ifelse(autores_top10$autor %in% familiares, "#FF481F", "#6588B1"),
+  titulo = "Autores mais frequentes — crianças e adolescentes",
+  subtitulo = paste("Notificações no Sinan,", periodo_sinan, "· coral: vínculo familiar único"),
+  nome_x = "Notificações"
+)
+```
+:::
+::: {.cena__caption}
+Fonte: Sinan/Ministério da Saúde. Registros sem informação do autor excluídos. Elaboração: DataSenado.
+:::
+:::
+
+::: {.cena data-cena="4"}
+::: {.cena__chart}
+```{r cena-4}
+ca |>
+  mutate(
+    ciclo_vida = coalesce(ciclo_vida, "Não informado"),
+    ciclo_vida_autor = coalesce(ciclo_vida_autor, "Ignorado")
+  ) |>
+  group_by(ciclo_vida, ciclo_vida_autor) |>
+  summarise(n = sum(n, na.rm = TRUE), .groups = "drop") |>
+  grafico_heatmap(
+    eixo_x = ciclo_vida_autor, eixo_y = ciclo_vida, valores = n,
+    titulo = "Ciclo de vida da vítima × ciclo de vida do autor",
+    nome_x = "Ciclo de vida do autor", nome_y = "Ciclo de vida"
+  )
+```
+:::
+::: {.cena__caption}
+Fonte: Sinan/Ministério da Saúde, `r periodo_sinan`. Escala de cores em logaritmo. Elaboração: DataSenado.
+:::
+:::
+
+::: {.cena data-cena="5"}
+::: {.cena__chart}
+```{r cena-5}
+barras_cores(
+  sexo_vitimas$genero_vitima, sexo_vitimas$n,
+  c(Feminino = "#FF481F", Masculino = "#6588B1", Ignorado = "#9CA3AF")[sexo_vitimas$genero_vitima],
+  titulo = "Sexo registrado das vítimas",
+  subtitulo = paste("Crianças e adolescentes · Sinan,", periodo_sinan),
+  nome_x = "Notificações"
+)
+```
+:::
+::: {.cena__caption}
+Fonte: Sinan/Ministério da Saúde, `r periodo_sinan`. Sexo registrado na ficha de notificação. Elaboração: DataSenado.
+:::
+:::
+
+::: {.cena data-cena="6"}
+::: {.cena__chart}
+```{r cena-6}
+cena6 <- sia |>
+  group_by(genero, idade) |>
+  summarise(n = sum(n), .groups = "drop") |>
+  grafico_linha(
+    idade, n, grupo = genero,
+    titulo = "Atendimentos ambulatoriais por violência sexual",
+    subtitulo = paste("Crianças e adolescentes · SIA/SUS,", periodo_sia),
+    nome_x = "Idade", nome_y = "Atendimentos",
+    cores = c(F = "#FF481F", M = "#6588B1"),
+    ponto_destaque = tibble(
+      x = sia_pico$idade, y = sia_pico$n,
+      rotulo = paste0(sia_pico$idade, " anos\n", fmt_int(sia_pico$n), " registros")
+    ),
+    legenda = "top"
+  )
+cena6
+```
+:::
+::: {.cena__caption}
+Fonte: SIA/SUS (registros de produção ambulatorial), `r periodo_sia`. Elaboração: DataSenado.
+:::
+:::
+
+::: {.cena data-cena="7"}
+::: {.cena__chart}
+```{r cena-7}
+sia_raca_ano <- sia |>
+  filter(ano >= ano_sia_inicial, ano <= ano_sia_completo, !is.na(raca)) |>
+  group_by(ano, raca) |>
+  summarise(n = sum(n), .groups = "drop")
+racas <- c("Branca", "Preta", "Parda", "Amarela", "Indígena", "Sem informação")
+cores_raca <- c("#6588B1", "#1F2430", "#FB913C", "#E6D837", "#447463", "#C9C4BB")
+series_raca <- lapply(racas, function(r) {
+  d <- sia_raca_ano |> filter(raca == r)
+  list(
+    name = r, type = "bar", stack = "total", barWidth = "55%",
+    itemStyle = list(color = unname(cores_raca[which(racas == r)])),
+    emphasis = list(focus = "series"),
+    data = lapply(sort(unique(sia_raca_ano$ano)), function(a) {
+      v <- d$n[d$ano == a]
+      if (length(v) == 0) 0 else v
+    })
+  )
+})
+anos <- sort(unique(sia_raca_ano$ano))
+widget_echarts(list(
+  color = as.list(cores_raca),
+  textStyle = list(fontFamily = fonte_senado, fontSize = 12),
+  title = list(
+    text = "Atendimentos por violência sexual, por ano e raça/cor",
+    subtext = paste0("Crianças e adolescentes · SIA/SUS, ", min(sia_ano_tot$ano), "–", ano_sia_completo),
+    left = "center", top = 4, textStyle = list(fontSize = 14), subtextStyle = list(fontSize = 12)
+  ),
+  grid = list(left = 14, right = 18, top = 64, bottom = 52, containLabel = TRUE),
+  legend = list(type = "scroll", bottom = 0),
+  tooltip = list(trigger = "axis", valueFormatter = numero_ptbr),
+  xAxis = list(type = "category", data = as.list(anos), axisTick = list(show = FALSE)),
+  yAxis = list(type = "value", name = "Atendimentos",
+               axisLabel = list(formatter = numero_ptbr), splitLine = list(show = TRUE)),
+  series = series_raca
+), "100%")
+```
+:::
+::: {.cena__caption}
+Fonte: SIA/SUS, `r min(sia_ano_tot$ano)`–`r ano_sia_completo` (anos completos). Elaboração: DataSenado.
+:::
+:::
+
+::: {.cena data-cena="8"}
+::: {.cena__chart}
+```{r cena-8}
+sih_ca_sexo_ano <- sih_ca |>
+  mutate(
+    ano = year(dt),
+    sexo = case_when(
+      genero == "3" ~ "Meninas",
+      genero == "1" ~ "Meninos",
+      TRUE ~ NA_character_
+    )
+  ) |>
+  filter(ano >= ano_sih_inicial, ano <= ano_sih_completo, !is.na(sexo)) |>
+  summarise(n = sum(n), .by = c(ano, sexo))
+
+cena8 <- sih_ca_sexo_ano |>
+  grafico_linha(
+    ano, n, grupo = sexo,
+    titulo = "Registros hospitalares por violência sexual",
+    subtitulo = paste0("Crianças e adolescentes por sexo · SIH/SUS, ", ano_sih_inicial, "–", ano_sih_completo),
+    nome_x = "Ano",
+    nome_y = "Registros hospitalares",
+    cores = c("Meninas" = "#FF481F", "Meninos" = "#6588B1"),
+    legenda = "top"
+  )
+cena8$x$opts$xAxis$axisLabel$formatter <- htmlwidgets::JS(
+  "function(v){return String(Math.round(v));}"
+)
+cena8
+```
+:::
+::: {.cena__caption}
+Fonte: SIH/SUS, `r ano_sih_inicial`–`r ano_sih_completo` (anos completos). Contagem pela soma de n. Elaboração: DataSenado.
+:::
+:::
+
+::: {.cena data-cena="9"}
+::: {.cena__chart}
+```{r cena-9}
+cnj_graf <- cnj_ano |> filter(ano >= ano_cnj_inicial, ano <= ano_cnj_completo)
+cena9 <- cnj_graf |>
+  grafico_linha(
+    ano, n,
+    titulo = "Processos ajuizados na Justiça estadual de 1º grau",
+    subtitulo = paste0("Temas ligados a crianças e adolescentes · ", min(cnj_graf$ano), "–", max(cnj_graf$ano)),
+    nome_y = "Processos",
+    legenda = "none",
+    cores = c("Processos" = "#6588B1")
+  )
+cena9$x$opts$series[[1]]$markLine <- list(
+  symbol = "none",
+  lineStyle = list(color = "#FF481F", type = "dashed", width = 1.5),
+  label = list(show = TRUE, position = "insideEndTop", color = "#FF481F", fontSize = 11,
+               formatter = "pandemia"),
+  data = list(list(xAxis = 2020))
+)
+cena9$x$opts$series[[1]]$markPoint <- list(
+  symbol = "circle", symbolSize = 7,
+  label = list(show = TRUE, position = "top", color = "#1F2430", fontSize = 11,
+               formatter = paste0("maior total: ", fmt_mil(cnj_pico$n), " mil")),
+  itemStyle = list(color = "#FF481F"),
+  data = list(list(coord = list(cnj_pico$ano, cnj_pico$n)))
+)
+cena9$x$opts$xAxis$axisLabel$formatter <- htmlwidgets::JS(
+  "function(v){return String(Math.round(v));}"
+)
+cena9
+```
+:::
+::: {.cena__caption}
+Fonte: CNJ, dados públicos da Justiça estadual de 1º grau, `r min(cnj_graf$ano)`–`r max(cnj_graf$ano)` (anos completos). Elaboração: DataSenado.
+:::
+:::
+
+::: {.cena data-cena="10"}
+::: {.cena__chart}
+```{r cena-10}
+assuntos_top |>
+  grafico_barras_horizontal(
+    categorias = assunto, valores = n,
+    titulo = "Assuntos mais frequentes",
+    subtitulo = paste("Processos da Justiça estadual ·", periodo_cnj),
+    cor = 1, nome_valores = "Nº de processos", nome_categorias = "Assunto"
+  )
+```
+:::
+::: {.cena__caption}
+Fonte: CNJ, dados públicos, `r periodo_cnj`. Um processo pode ter mais de um assunto. Elaboração: DataSenado.
+:::
+:::
+
+::: {.cena data-cena="11"}
+::: {.cena__chart}
+```{r cena-11}
+processos_mes <- proc |>
+  distinct(mes = floor_date(dt, unit = "month"), numero_processo) |>
+  summarise(Processos = n(), .by = mes)
+notificacoes_mes <- sinan |>
+  mutate(mes = floor_date(data_notific, unit = "month")) |>
+  summarise(Notificações = sum(n, na.rm = TRUE), .by = mes)
+
+full_join(processos_mes, notificacoes_mes, by = "mes") |>
+  pivot_longer(cols = c(Processos, Notificações), names_to = "serie", values_to = "n") |>
+  filter(!is.na(n)) |>
+  grafico_linha(
+    mes, n, grupo = serie,
+    titulo = "Processos ajuizados e notificações de violência",
+    subtitulo = "Brasil · série mensal",
+    nome_y = "Nº de registros",
+    cores = c(Processos = "#6588B1", Notificações = "#FF481F"),
+    legenda = "top"
+  )
+```
+:::
+::: {.cena__caption}
+Fonte: CNJ e Sinan/Ministério da Saúde. Elaboração: DataSenado.
+:::
+:::
+
+::: {.cena data-cena="12"}
+::: {.cena__chart}
+```{r cena-12}
+# Coroplético municipal no mesmo padrão do painel: faixa "0" + quintis.
+malha_ct <- carregar_malha_conselhos("..")
+mun_geo <- malha_ct$dados
+
+mapa_ct <- mun_geo |>
+  mutate(mun = as.character(code_muni)) |>
+  left_join(
+    cons_tut |> mutate(mun = as.character(mun)),
+    by = "mun"
+  )
+
+# ct_por_pop_crianca_adolescente vem por mil habitantes; a história adota
+# conselhos por 100 mil crianças e adolescentes.
+mapa_ct <- mapa_ct |>
+  mutate(taxa_ct = ct_por_pop_crianca_adolescente * 100)
+
+x <- mapa_ct$taxa_ct
+breaks_ct <- unique(quantile(
+  x[x > 0 & !is.na(x)],
+  probs = seq(0, 1, 0.2),
+  na.rm = TRUE,
+  names = FALSE
+))
+faixa_pos <- cut(
+  x,
+  breaks = breaks_ct,
+  include.lowest = TRUE,
+  dig.lab = 3,
+  ordered_result = TRUE
+)
+mapa_ct <- mapa_ct |>
+  mutate(
+    faixa_ct = case_when(
+      is.na(taxa_ct) ~ NA_character_,
+      taxa_ct == 0   ~ "0",
+      TRUE           ~ as.character(faixa_pos)
+    ),
+    faixa_ct = factor(faixa_ct, levels = c("0", levels(faixa_pos)))
+  )
+
+geojson_ct <- malha_ct$geojson
+
+faixas_exibicao <- levels(mapa_ct$faixa_ct)
+cores_ct <- viridisLite::viridis(length(faixas_exibicao), option = "C", direction = -1)
+
+formatar_limite <- function(x) {
+  formatC(x, format = "fg", digits = 3, decimal.mark = ",", big.mark = ".")
+}
+rotulos_faixas <- c(
+  "0",
+  vapply(seq_len(length(breaks_ct) - 1), function(i) {
+    limite_inferior <- formatar_limite(breaks_ct[i])
+    limite_superior <- formatar_limite(breaks_ct[i + 1])
+    if (i == 1) {
+      paste0("de ", limite_inferior, " a ", limite_superior)
+    } else {
+      paste0("> ", limite_inferior, " a ", limite_superior)
+    }
+  }, character(1))
+)
+
+valores_ct <- lapply(seq_len(nrow(mapa_ct)), function(i) {
+  list(
+    name = as.character(mapa_ct$mun[i]),
+    value = if (is.na(mapa_ct$faixa_ct[i])) -1 else as.integer(mapa_ct$faixa_ct[i]) - 1,
+    municipio = as.character(mapa_ct$name_muni[i]),
+    ct = mapa_ct$num_ct[i],
+    taxa = if (is.na(mapa_ct$taxa_ct[i])) {
+      NULL
+    } else {
+      mapa_ct$taxa_ct[i]
+    }
+  )
+})
+pedacos_ct <- c(
+  lapply(seq_along(faixas_exibicao), function(i) {
+    list(value = i - 1, label = rotulos_faixas[i], color = cores_ct[i])
+  }),
+  list(list(value = -1, label = "Sem informação", color = "red"))
+)
+
+widget_echarts(list(
+  textStyle = list(fontFamily = fonte_senado, fontSize = 12),
+  title = list(
+    text = "Conselhos tutelares por 100 mil crianças e adolescentes",
+    subtext = "Segundo o município · Brasil, 2023",
+    left = "center", top = 4,
+    textStyle = list(fontSize = 14), subtextStyle = list(fontSize = 12)
+  ),
+  tooltip = list(trigger = "item", formatter = htmlwidgets::JS(
+    "function(p){var d=p.data||{};return '<b>'+(d.municipio||p.name)+'</b><br>Conselhos tutelares: '+Number(d.ct||0).toLocaleString('pt-BR')+'<br>Por 100 mil crianças e adolescentes: '+(d.taxa==null?'Sem informação':Number(d.taxa).toLocaleString('pt-BR'));}"
+  )),
+  visualMap = list(
+    show = TRUE, type = "piecewise",
+    pieces = pedacos_ct,
+    showLabel = TRUE,
+    left = 8, bottom = 8,
+    itemWidth = 14, itemHeight = 10, itemGap = 4,
+    textStyle = list(fontSize = 11)
+  ),
+  series = list(list(
+    type = "map", map = "municipios_ct", roam = FALSE,
+    layoutCenter = list("50%", "52%"), layoutSize = "88%", aspectScale = 1,
+    itemStyle = list(borderColor = "#FFFFFF", borderWidth = 0.3),
+    label = list(show = FALSE),
+    emphasis = list(label = list(show = FALSE)),
+    data = valores_ct
+  ))
+), "100%") |>
+  echarts4r::e_map_register("municipios_ct", geojson_ct) |>
+  adicionar_elementos_cartograficos(arquivo = "../assets/elementos-cartograficos.js")
+```
+:::
+::: {.cena__caption}
+Fonte: IBGE, Pesquisa MUNIC 2023, e Censo Demográfico 2022. Elaboração: DataSenado.
+:::
+:::
+
+:::
+
+:::
+
+:::
+
+::: {.fim data-cena="-1"}
+
+## O que os dados nos dizem
+
+* A tabela SINAN reúne **`r fmt_int(tot_ca)` notificações** envolvendo crianças e adolescentes; **`r fmt_pct(tot_criancas/tot_ca)`** se referem a crianças de 0 a 11 anos.
+* Um único vínculo familiar está assinalado em **`r fmt_pct(n_familiares/tot_ca)`** das notificações desses grupos. As múltiplas relações são preservadas em categoria própria.
+* Nos registros de violência sexual do SIA, o pico entre meninas está aos **`r sia_pico$idade` anos**. No SIH, a mediana ponderada é de **`r mediana_sih` anos**.
+* **Saúde e Justiça oferecem perspectivas distintas**. Suas séries não permitem vincular diretamente notificações a processos.
+* A base reúne **`r fmt_int(tot_ct)` conselhos tutelares**. A interpretação territorial depende também da qualidade do preenchimento dos municípios.
+
+
+::: {.fontes}
+**Fontes e metodologia.** Sinan/Ministério da Saúde (`r periodo_sinan`); SIA/SUS (`r periodo_sia`); SIH/SUS (`r periodo_sih`); CNJ, dados públicos da Justiça estadual de 1º grau (`r periodo_cnj`); IBGE, Pesquisa MUNIC 2023 e Censo Demográfico 2022. As tabelas de saúde são agregadas e suas frequências são calculadas pela soma de **n**. SIA e SIH selecionam diagnósticos T742 ou Y05 e idades de 0 a 17 anos; o Sinan reúne notificações de violência interpessoal e autoprovocada com vítimas de 0 a 17 anos. As características dos autores são preservadas independentemente de sua faixa etária. Crianças têm menos de 12 anos; adolescentes, de 12 a 17. A mediana de idade do SIH é ponderada por n. Os registros não representam necessariamente pessoas únicas. A comparação anual de SIA, SIH e CNJ exclui os anos nas extremidades quando os registros disponíveis não começam em janeiro ou não terminam em dezembro. No Sinan, `r fmt_pct(pct_sem_detalhe)` das notificações de crianças e adolescentes têm motivação ausente ou agrupada como não detalhada. Na MUNIC, valores zero incluem respostas convertidas de "não informou"; não permitem identificar isoladamente municípios sem conselho.
+:::
+
+:::
+
+```{=html}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  var triggers = Array.prototype.slice.call(document.querySelectorAll('[data-cena]'));
+  var cenas = Array.prototype.slice.call(document.querySelectorAll('.cena'));
+  var contador = document.getElementById('contador');
+  var barra = document.querySelector('.progresso__barra');
+  var atual = null;
+
+  function ativa(idx) {
+    if (idx === atual) return;
+    atual = idx;
+    cenas.forEach(function (c) {
+      c.classList.toggle('ativa', Number(c.getAttribute('data-cena')) === idx);
+    });
+    if (contador) {
+      contador.textContent = idx >= 0 ? (idx + 1) + ' / ' + cenas.length : '—';
+    }
+    window.dispatchEvent(new Event('resize'));
+  }
+
+  var io = new IntersectionObserver(function (entries) {
+    // entra a etapa com maior area visivel dentro da faixa central
+    var melhor = entries.filter(function (e) { return e.isIntersecting; })
+      .sort(function (a, b) { return b.intersectionRatio - a.intersectionRatio; })[0];
+    if (melhor) ativa(Number(melhor.target.getAttribute('data-cena')));
+  }, { rootMargin: '-42% 0px -52% 0px', threshold: 0 });
+
+  // so observa apos o load: a notificacao inicial no DOMContentLoaded
+  // acontece com o layout ainda transiente e relata intersecoes falsas
+  window.addEventListener('load', function () {
+    triggers.forEach(function (t) { io.observe(t); });
+  });
+
+  window.addEventListener('scroll', function () {
+    if (!barra) return;
+    var h = document.documentElement;
+    var p = h.scrollTop / Math.max(1, h.scrollHeight - h.clientHeight);
+    barra.style.width = (p * 100).toFixed(2) + '%';
+  }, { passive: true });
+});
+</script>
+<div class="progresso"><div class="progresso__barra"></div></div>
+```
+

@@ -1,0 +1,1119 @@
+---
+title: "Violência sexual contra crianças e adolescentes"
+lang: pt-BR
+
+format:
+  dashboard:
+    theme: [cosmo, senado.scss]
+    logo: assets/logo-datasenado.jpg
+    orientation: rows
+    scrolling: false
+    expandable: true
+    include-in-header:
+      text: |
+        <style>
+        /* Mantém os contêineres dos widgets preenchendo o cartão no HTML exportado. */
+        .quarto-dashboard .bslib-card,
+        .quarto-dashboard .card-body,
+        .quarto-dashboard .html-fill-container,
+        .quarto-dashboard .html-widget {
+          min-height: 0;
+        }
+        .quarto-dashboard .html-widget,
+        .quarto-dashboard .echarts4r {
+          width: 100% !important;
+          height: 100% !important;
+        }
+        .quarto-dashboard .card-body > .html-widget,
+        .quarto-dashboard .card-body > .echarts4r {
+          flex: 1 1 auto;
+        }
+        .quarto-dashboard .bslib-value-box .value-box-value {
+          font-size: 24px !important;
+          line-height: 1.2;
+        }
+        /* Mapas com rankings: o Quarto 1.7 não converte width= de divs de
+           layout em larguras de coluna; impõe as proporções declaradas nos
+           grids cujos filhos carregam esses atributos. */
+        .quarto-dashboard .bslib-grid:has(> .bslib-grid[width="70%"]) {
+          grid-template-columns: minmax(3em, 70fr) minmax(3em, 30fr) !important;
+        }
+        .quarto-dashboard .bslib-grid:has(> .bslib-grid[width="50%"]) {
+          grid-template-columns: minmax(3em, 50fr) minmax(3em, 25fr) minmax(3em, 25fr) !important;
+        }
+        .quarto-dashboard .bslib-grid:has(> .bslib-grid[height="15%"]) {
+          grid-template-rows: minmax(3em, 15fr) minmax(3em, 45fr) minmax(3em, 40fr) !important;
+        }
+        </style>
+        <script>
+        document.addEventListener('shown.bs.tab', function () {
+          // As abas secundárias são renderizadas ocultas; força o ECharts a
+          // recalcular o tamanho depois que a aba passa a estar visível.
+          window.setTimeout(function () {
+            window.dispatchEvent(new Event('resize'));
+          }, 50);
+          // Monta o iframe da História ao abrir a primeira aba (lazy load): o
+          // src é criado em execução para o Quarto não embutir o arquivo
+          // inteiro no HTML gerado (o painel ficaria gigante e pesado).
+          var slot = document.getElementById('historia-slot');
+          if (slot && !slot.querySelector('iframe')) {
+            var f = document.createElement('iframe');
+            f.src = 'historia/historia.html';
+            f.title = 'O retrato da violência contra crianças e adolescentes no Brasil';
+            f.setAttribute('style', 'width: 100%; height: 100%; border: 0; display: block;');
+            slot.appendChild(f);
+          }
+        });
+        </script>
+
+execute:
+  echo: false
+  warning: false
+  message: false
+  cache: true
+---
+
+```{r setup}
+#| include: false
+#| cache: false
+
+library(tidyverse)
+library(scales)
+library(echarts4r)
+source("funcoes_graf.r")
+
+# Corte pela população total do município, comum aos dois tipos de atendimento.
+populacao_minima_municipio <- 20000L
+```
+
+# DATASUS
+
+## Subpainéis {.tabset}
+
+### Ambulatoriais
+
+::::: {.rows}
+
+:::: {.columns height="15%"}
+
+```{r card_viol_total}
+#| content: valuebox
+#| title: "Nº total violência sexual"
+#| cache: false
+
+load("tabelas/viol_sexual_ca_sia_pa.rda")
+
+viol_sexual_ca_sia_pa <- viol_sexual_ca_sia_pa |> 
+  filter(competencia >= ym("201501"))
+         
+n_total <- format(sum(viol_sexual_ca_sia_pa$n), big.mark = '.', decimal.mark = ',' )
+
+list(
+  icon = "bandaid-fill",
+  color = "danger",
+  value = format(n_total, big.mark = ".", decimal.mark = ",")
+)
+```
+
+```{r card_genero}
+#| content: valuebox
+#| title: "Gênero mais violentado"
+
+maior_genero <- viol_sexual_ca_sia_pa |>
+  group_by(genero) |> 
+  reframe(n=sum(n)) |> 
+  arrange(-n) |> 
+  head(1) |>
+  pull(genero)
+  
+
+icone_maior_genero <- if(maior_genero == "F" ){"gender-female"} else {"gender-male"}
+
+n_maior_genero <- viol_sexual_ca_sia_pa |> 
+  group_by(genero) |> 
+  reframe(n=sum(n)) |> 
+  pivot_wider(names_from = genero, values_from = n, values_fill = 0) |> 
+  mutate(prop_F = `F`/(`F`+M)) |> 
+  pull()  
+  
+
+
+  list(
+  icon = icone_maior_genero,
+  color = "light",
+  value = percent(if_else(maior_genero=="F", n_maior_genero, 1 - n_maior_genero), accuracy = .1)
+)
+```
+
+```{r card_raca_cor}
+#| content: valuebox
+#| title: "Maior frequência de violência"
+
+n_raca_cor <- viol_sexual_ca_sia_pa |> 
+  group_by(raca_cor) |> 
+  reframe(n=sum(n)) |> 
+  arrange(-n) |> 
+  head(1)
+
+list(
+  icon = "person-fill",
+  color = "#FB913C",
+  value = paste0(
+    format(n_raca_cor$n[1], big.mark = ".", decimal.mark = ","),
+    " pessoas pardas"
+  )
+)
+
+```
+
+```{r card_idade}
+#| content: valuebox
+#| title: "Idade mais vitimada"
+
+idade <- viol_sexual_ca_sia_pa |> 
+  group_by(idade) |> 
+  reframe(n=sum(n)) |> 
+  arrange(-n) |> 
+  head(1) |> 
+  pull(idade)
+
+
+
+list(
+  icon = "universal-access",
+  color = "info",
+  value = idade
+)
+```
+
+
+
+```{r creditos}
+#| content: valuebox
+#| title: "Fontes"
+#| cache: false
+
+meses_fontes <- c("jan", "fev", "mar", "abr", "mai", "jun",
+                  "jul", "ago", "set", "out", "nov", "dez")
+periodo_fontes <- range(viol_sexual_ca_sia_pa$competencia, na.rm = TRUE)
+periodo_fontes <- paste0(meses_fontes[month(periodo_fontes)], "/", year(periodo_fontes))
+
+list(
+  value = paste0("SIA/SUS — de ", periodo_fontes[1], " a ", periodo_fontes[2]),
+  color = "text-info"
+)
+```
+
+```{r outras-fontes}
+#| content: valuebox
+#| title: "Outras fontes"
+
+list(
+  value = "SIH/SUS · SINAN · CNJ · IBGE · MS/Ripsa",
+  color = "text-info"
+)
+```
+
+::::
+
+:::: {.columns height="45%"}
+
+```{r}
+#| label: grafico-idade-genero
+
+viol_sexual_ca_sia_pa |> 
+  group_by(genero, idade) |> 
+  reframe(n = sum(n)) |> 
+  grafico_linha(
+    eixo_x = idade,
+    eixo_y = n,
+    grupo = genero,
+    nome_x = "Idade",
+    nome_y = "Notificações",
+    cores = c(F = cores_genero[["Fem"]], M = cores_genero[["Masc"]]),
+    legenda = "bottom"
+  )
+
+```
+
+```{r}
+#| label: grafico-idade-raca_cor
+
+viol_sexual_ca_sia_pa |> 
+  group_by(raca_cor, idade) |> 
+  reframe(n = sum(n)) |> 
+  grafico_linha(
+    eixo_x = idade,
+    eixo_y = n,
+    grupo = raca_cor,
+    nome_x = "Idade",
+    nome_y = "Notificações",
+    cores = paleta,
+    legenda = "bottom"
+  )
+
+```
+
+::::
+
+:::: {.columns height="40%"}
+
+```{r}
+#| label: grafico-data-genero
+
+viol_sexual_ca_sia_pa |> 
+  group_by(genero, competencia) |> 
+  reframe(n = sum(n)) |> 
+  grafico_linha(
+    eixo_x = competencia,
+    eixo_y = n,
+    grupo = genero,
+    nome_x = "Competência",
+    nome_y = "Notificações",
+    cores = c(F = cores_genero[["Fem"]], M = cores_genero[["Masc"]]),
+    legenda = "bottom"
+  )
+
+```
+
+```{r}
+#| label: grafico-data-raca_cor
+
+viol_sexual_ca_sia_pa |> 
+  group_by(raca_cor, competencia) |> 
+  reframe(n = sum(n)) |> 
+  grafico_linha(
+    eixo_x = competencia,
+    eixo_y = n,
+    grupo = raca_cor,
+    nome_x = "Competência",
+    nome_y = "Notificações",
+    cores = paleta,
+    legenda = "bottom"
+  )
+
+```
+
+::::
+
+:::::
+
+
+### Ambulatoriais por município
+
+```{r taxas-municipais-preparo}
+#| include: false
+#| cache: false
+
+load("tabelas/taxa_ambulatorial_municipio.rda")
+load("tabelas/taxa_hospitalar_municipio.rda")
+if (!file.exists("assets/municipios_2025.geojson")) {
+  source("preparar_malha_taxas.R")
+}
+geojson_taxas <- jsonlite::read_json("assets/municipios_2025.geojson",
+                                   simplifyVector = FALSE)
+```
+
+::::: {.columns}
+
+:::: {.rows width="50%"}
+
+```{r mapa-taxa-ambulatorial}
+#| cache: false
+
+grafico_taxa_municipal(taxa_ambulatorial_municipio, geojson_taxas,
+                       "Atendimentos ambulatoriais por violência sexual",
+                       populacao_minima = populacao_minima_municipio)
+```
+
+::::
+
+:::: {.rows width="25%"}
+
+```{r ranking-ambulatorial-maiores}
+#| title: "Maiores taxas ambulatoriais"
+#| cache: false
+
+ranking_taxa_municipal(taxa_ambulatorial_municipio,
+                      populacao_minima = populacao_minima_municipio)
+```
+
+::::
+
+:::: {.rows width="25%"}
+
+
+```{r ranking-ambulatorial-menores}
+#| title: "Menores taxas ambulatoriais"
+#| cache: false
+
+ranking_taxa_municipal(taxa_ambulatorial_municipio, maiores = FALSE,
+                      populacao_minima = populacao_minima_municipio)
+```
+
+::::
+
+:::::
+
+
+### Hospitalares
+
+```{r sihsus_rd}
+
+
+library(tidyverse)
+library(scales)
+library(echarts4r)
+source('funcoes_graf.r')
+source('config.R')
+
+
+
+load('tabelas/sih_viol_sexual')
+
+base <- sih_viol_sexual |> 
+  filter(!is.na(competencia), idade >= 0, idade <= 17) |>
+  transmute(
+    data = floor_date(competencia, unit = 'quarter'),
+    genero = case_when(
+      genero == "1" ~ "Masc",
+      genero == "3" ~ "Fem",
+      TRUE ~ "NI"
+    ),
+    idade = idade,
+    n = n,
+    ciclo_vida = case_when(
+      idade < 12 ~ "Criança",
+      idade <= 17 ~ "Adolescente",
+      TRUE ~ NA_character_
+    )
+    ) |> 
+  # Mantém a exclusão do trimestre mais recente usada pelo painel.
+  filter(data != max(data)) 
+
+titulo_sih <- paste("Violência sexual -", min(year(base$data)), "a", max(year(base$data)))
+
+fmt_tri <- function(x) {
+  paste0(quarter(x), "º trim ", year(x))
+}
+
+base_4tri <- base |>
+  filter(dense_rank(desc(data)) <= 4)
+
+titulo_4tri <- paste(
+  "Violência sexual -",
+  fmt_tri(min(base_4tri$data, na.rm = TRUE)),
+  "a",
+  fmt_tri(max(base_4tri$data, na.rm = TRUE))
+)
+
+graf_tri <- function(d, subtitulo) {
+  grafico_linha(
+    d,
+    eixo_x = data,
+    eixo_y = n,
+    titulo = titulo_sih,
+    subtitulo = subtitulo,
+    nome_x = "Trimestre",
+    nome_y = "Registros hospitalares",
+    cores = c("Registros hospitalares" = "#333333"),
+    ponto_destaque = d |>
+      slice_max(n, n = 1, with_ties = FALSE) |>
+      transmute(
+        x = data,
+        y = n,
+        rotulo = paste0(year(data), " - ", quarter(data), "º tri.\n", n, " registros")
+      ),
+    legenda = "none"
+  )
+}
+
+graf_idade <- function(d, titulo, subtitulo) {
+  grafico_linha(
+    d,
+    eixo_x = idade,
+    eixo_y = n,
+    grupo = genero,
+    titulo = titulo,
+    subtitulo = subtitulo,
+    nome_x = "Idade",
+    nome_y = "Registros hospitalares",
+    cores = cores_genero,
+    legenda = "bottom"
+  )
+}
+
+g1 <- base |> filter(ciclo_vida == "Criança") |>
+  summarise(n = sum(n), .by = data) |> graf_tri("Criança")
+
+g2 <- base |> filter(ciclo_vida == "Adolescente") |>
+  summarise(n = sum(n), .by = data) |> graf_tri("Adolescente")
+
+g3 <- base |> filter(ciclo_vida == "Criança") |>
+  summarise(n = sum(n), .by = c(genero, idade)) |> graf_idade(titulo_sih, "Criança")
+
+
+g4 <- base |> filter(ciclo_vida == "Adolescente") |>
+  summarise(n = sum(n), .by = c(genero, idade)) |> graf_idade(titulo_sih, "Adolescente")
+
+g5 <- base_4tri |> filter(ciclo_vida == "Criança") |>
+  summarise(n = sum(n), .by = c(genero, idade)) |> graf_idade(titulo_4tri, "Criança")
+
+g6 <- base_4tri |> filter(ciclo_vida == "Adolescente") |>
+  summarise(n = sum(n), .by = c(genero, idade)) |> graf_idade(titulo_4tri, "Adolescente")
+
+grade_paineis(list(g1, g2, g3, g4, g5, g6), colunas = 2)
+
+```
+
+
+
+
+
+
+
+### Hospitalares por município
+
+::::: {.columns}
+
+:::: {.rows width="50%"}
+
+```{r mapa-taxa-hospitalar}
+#| cache: false
+
+grafico_taxa_municipal(taxa_hospitalar_municipio, geojson_taxas,
+                       "Atendimentos hospitalares por violência sexual",
+                       populacao_minima = populacao_minima_municipio)
+```
+
+::::
+
+:::: {.rows width="25%"}
+
+```{r ranking-hospitalar-maiores}
+#| title: "Maiores taxas hospitalares"
+#| cache: false
+
+ranking_taxa_municipal(taxa_hospitalar_municipio,
+                      populacao_minima = populacao_minima_municipio)
+```
+
+
+::::
+
+:::: {.rows width="25%"}
+
+```{r ranking-hospitalar-menores}
+#| title: "Menores taxas hospitalares"
+#| cache: false
+
+ranking_taxa_municipal(taxa_hospitalar_municipio, maiores = FALSE,
+                      populacao_minima = populacao_minima_municipio)
+```
+
+::::
+
+:::::
+
+
+### Motivos
+
+
+```{r Motivos, cache=FALSE}
+#| title: Motivos
+
+
+library(tidyverse)
+library(scales)
+library(echarts4r)
+load('tabelas/sinan.rda')
+source('funcoes_graf.r')
+source('config.R')
+
+uf_ibge <- tibble::tribble(
+  ~cod_uf, ~uf, ~nome_uf,
+  11, "RO", "Rondônia",
+  12, "AC", "Acre",
+  13, "AM", "Amazonas",
+  14, "RR", "Roraima",
+  15, "PA", "Pará",
+  16, "AP", "Amapá",
+  17, "TO", "Tocantins",
+  21, "MA", "Maranhão",
+  22, "PI", "Piauí",
+  23, "CE", "Ceará",
+  24, "RN", "Rio Grande do Norte",
+  25, "PB", "Paraíba",
+  26, "PE", "Pernambuco",
+  27, "AL", "Alagoas",
+  28, "SE", "Sergipe",
+  29, "BA", "Bahia",
+  31, "MG", "Minas Gerais",
+  32, "ES", "Espírito Santo",
+  33, "RJ", "Rio de Janeiro",
+  35, "SP", "São Paulo",
+  41, "PR", "Paraná",
+  42, "SC", "Santa Catarina",
+  43, "RS", "Rio Grande do Sul",
+  50, "MS", "Mato Grosso do Sul",
+  51, "MT", "Mato Grosso",
+  52, "GO", "Goiás",
+  53, "DF", "Distrito Federal"
+) |> dplyr::arrange(uf)
+
+
+sinan |> 
+  filter(ciclo_vida %in% c("Criança", "Adolescente"),
+         ciclo_vida != "Jovem"  ,
+         #year(data_notific) >2020
+         ) |> 
+  group_by(data_notific, ciclo_vida, motivo_violencia) |> 
+  summarise(n=sum(n), 
+            .groups = 'drop') |> 
+  grafico_linhas_facetas(
+    eixo_x = data_notific,
+    eixo_y = n,
+    grupo = ciclo_vida,
+    titulo = "Nº notificações",
+    escala_y_livre = TRUE,
+    facet = motivo_violencia,
+    colunas = 3,
+   
+  )
+
+  
+```
+
+### Agressores
+
+```{r Agressores, cache=FALSE}
+#| title: Agressores
+
+# um gráfico individual por autor, dispostos em grade que ocupa o cartão
+autores_ord <- sinan |>
+  filter(ciclo_vida %in% c("Criança", "Adolescente"), !is.na(autor)) |>
+  summarise(n = sum(n), .by = autor) |>
+  arrange(desc(n)) |>
+  pull(autor)
+
+graficos_autor <- lapply(autores_ord, function(a) {
+  sinan |>
+    filter(ciclo_vida %in% c("Criança", "Adolescente"), autor == a) |>
+    group_by(data_notific, ciclo_vida) |>
+    summarise(n = sum(n), .groups = "drop") |>
+    grafico_linha(
+      eixo_x = data_notific,
+      eixo_y = n,
+      grupo = ciclo_vida,
+      titulo = a,
+      legenda = "none"
+    )
+})
+
+grade_paineis(graficos_autor, colunas = 5)
+
+```
+
+
+### Agressores x Vítimas
+
+```{r Agressores x Vítimas}
+#| title: Agressores e vítimas
+
+dados_heatmap <- sinan |>
+  mutate(
+    ciclo_vida       = coalesce(ciclo_vida, "Não informado"),
+    ciclo_vida_autor = coalesce(ciclo_vida_autor, "Ignorado")
+  ) |>
+  group_by(ciclo_vida, ciclo_vida_autor) |>
+  summarise(n = sum(n, na.rm = TRUE), .groups = "drop")
+
+grade_paineis(list(
+  grafico_heatmap(
+    dados_heatmap,
+    eixo_x = ciclo_vida_autor,
+    eixo_y = ciclo_vida,
+    valores = n,
+    titulo = "Distribuição segundo o ciclo de vida e o ciclo de vida do autor",
+    nome_x = "Ciclo de vida do autor",
+    nome_y = "Ciclo de vida"
+  ),
+  grafico_heatmap(
+    dados_heatmap |> filter(ciclo_vida %in% c('Adolescente', 'Criança')),
+    eixo_x = ciclo_vida_autor,
+    eixo_y = ciclo_vida,
+    valores = n,
+    titulo = "Distribuição criança/adolescente e o ciclo de vida do autor",
+    nome_x = "Ciclo de vida do autor",
+    nome_y = "Ciclo de vida"
+  )
+), colunas = 1)
+
+```
+
+### Autor x Vítima x Causa
+```{r principais cruzamentos}
+#| title: Autor x Vítima x Causa
+
+pacman::p_load(dplyr, gtExtras, gt, scales)
+
+
+
+sinan |> 
+  filter(ciclo_vida %in% c("Criança", "Adolescente"),
+         ciclo_vida != "Jovem") |> 
+  group_by(ciclo_vida_autor, ciclo_vida, motivo_violencia) |> 
+  summarise(n=sum(n), .groups = 'drop') |> 
+  arrange(-n) |> 
+  head(20) |> 
+  mutate(
+    ciclo_vida_autor = coalesce(ciclo_vida_autor, "Não informado"),
+    ciclo_vida       = coalesce(ciclo_vida, "Não informado"),
+    motivo_violencia = coalesce(motivo_violencia, "Não informado"),
+    barra             = n
+  ) |>
+  gt() |>
+  cols_label(
+    ciclo_vida_autor = "Ciclo de vida do autor",
+    ciclo_vida       = "Ciclo de vida da vítima",
+    motivo_violencia = "Motivo da violência",
+    n                 = "Frequência",
+    barra             = "Frequência relativa"
+  ) |>
+  fmt_number(
+    columns = n,
+    decimals = 0,
+    sep_mark = ".",
+    dec_mark = ","
+  ) |>
+  gt_plt_bar(
+    column = barra,
+    scaled = TRUE,
+    color = "#3B82F6",
+    background = "#E5E7EB",
+    width = 60
+  ) |>
+  cols_align(
+    align = "left",
+    columns = c(
+      ciclo_vida_autor,
+      ciclo_vida,
+      motivo_violencia
+    )
+  ) |>
+  cols_align(
+    align = "right",
+    columns = n
+  ) |>
+  cols_width(
+    ciclo_vida_autor ~ px(150),
+    ciclo_vida       ~ px(150),
+    motivo_violencia ~ px(250),
+    n                 ~ px(110),
+    barra             ~ px(180)
+  )
+
+
+```
+
+### Autor x Vítima x Gênero
+```{r principais cruzamentos - gênero}
+#| title: Autor x Vítima x Gênero
+
+ordem <- sinan |> 
+  filter(ciclo_vida %in% c("Criança", "Adolescente")) |> 
+  group_by(motivo_violencia) |> 
+  summarise(
+    n = sum(n, na.rm = TRUE),
+    .groups = "drop"
+  ) |> 
+  arrange(desc(n), motivo_violencia) |> 
+  slice_head(n = 10) |> 
+  pull(motivo_violencia)
+
+sinan |> 
+  filter(
+    ciclo_vida %in% c("Criança", "Adolescente"),
+    match(motivo_violencia, ordem, nomatch = 0L) > 0L
+  ) |> 
+  group_by(
+    genero_autor,
+    genero_vitima,
+    motivo_violencia
+  ) |> 
+  summarise(
+    n = sum(n, na.rm = TRUE),
+    .groups = "drop"
+  ) |> 
+  mutate(
+    ordem_motivo = match(motivo_violencia, ordem)
+  ) |>
+  arrange(
+    ordem_motivo,
+    desc(n)
+  ) |> 
+  mutate(
+    genero_vitima = coalesce(
+      genero_vitima,
+      "Não informado"
+    ),
+    genero_autor = coalesce(
+      genero_autor,
+      "Não informado"
+    ),
+    motivo_violencia = coalesce(
+      motivo_violencia,
+      "Não informado"
+    ),
+    barra = n
+  ) |>
+  select(-ordem_motivo) |>
+  gt() |>
+  cols_label(
+    genero_autor     = "Gênero do autor",
+    genero_vitima    = "Gênero da vítima",
+    motivo_violencia = "Motivo da violência",
+    n                 = "Frequência",
+    barra             = "Frequência relativa"
+  ) |>
+  fmt_number(
+    columns = n,
+    decimals = 0,
+    sep_mark = ".",
+    dec_mark = ","
+  ) |>
+  gt_plt_bar(
+    column = barra,
+    scaled = TRUE,
+    color = "#3B82F6",
+    background = "#E5E7EB",
+    width = 60
+  ) |>
+  cols_align(
+    align = "left",
+    columns = c(
+      genero_autor,
+      genero_vitima,
+      motivo_violencia
+    )
+  ) |>
+  cols_align(
+    align = "right",
+    columns = n
+  ) |>
+  cols_width(
+    genero_autor     ~ px(150),
+    genero_vitima    ~ px(150),
+    motivo_violencia ~ px(250),
+    n                 ~ px(110),
+    barra             ~ px(180)
+  )
+
+```
+
+
+
+# Justiça
+
+## Subpainéis {.tabset}
+
+```{r processos-preparo, cache=FALSE}
+#| results: asis
+
+load('justica/processos_df.rda')
+
+grafico_processos <- function(estado = NULL) {
+  if (is.null(estado)) {
+    processos_mes <- processos_df |>
+      mutate(
+        data = ymd(str_sub(data_ajuizamento, 1, 8)),
+        mes  = floor_date(data, unit = "month")
+      ) |>
+      distinct(mes, numero_processo) |>
+      count(mes, name = "Processos")
+
+    notificacoes_mes <- sinan |>
+      mutate(
+        data_notific = ymd(data_notific),
+        mes = floor_date(data_notific, unit = "month")
+      ) |>
+      summarise(Notificações = sum(n, na.rm = TRUE), .by = mes)
+
+    nome_estado <- "Brasil"
+  } else {
+    processos_mes <- processos_df |>
+      filter(uf == estado) |>
+      mutate(
+        data = ymd(str_sub(data_ajuizamento, 1, 8)),
+        mes  = floor_date(data, unit = "month")
+      ) |>
+      distinct(mes, numero_processo) |>
+      count(mes, name = "Processos")
+
+    notificacoes_mes <- sinan |>
+      filter(SG_UF_OCOR == uf_ibge$cod_uf[which(uf_ibge$uf == estado)]) |>
+      mutate(
+        data_notific = ymd(data_notific),
+        mes = floor_date(data_notific, unit = "month")
+      ) |>
+      summarise(Notificações = sum(n, na.rm = TRUE), .by = mes)
+
+    nome_estado <- uf_ibge$nome_uf[which(uf_ibge$uf == estado)]
+  }
+
+  full_join(processos_mes, notificacoes_mes, by = "mes") |>
+    pivot_longer(
+      cols = c(Processos, Notificações),
+      names_to = "serie",
+      values_to = "n"
+    ) |>
+    grafico_linha(
+      eixo_x = mes,
+      eixo_y = n,
+      grupo = serie,
+      titulo = "Processos ajuizados e notificações",
+      subtitulo = nome_estado,
+      nome_y = "Número de registros",
+      cores = c(Processos = "#0072B2", Notificações = "#D55E00"),
+      legenda = "bottom"
+    )
+}
+
+for (estado in c(NA_character_, uf_ibge$uf)) {
+  titulo_aba <- if (is.na(estado)) "Nº Processos" else estado
+  cat("\n#### ", titulo_aba, "\n\n")
+  cat(knitr::knit_child(text = c(
+    sprintf("```{r processos-%s}", ifelse(is.na(estado), "br", tolower(estado))),
+    ifelse(is.na(estado), "grafico_processos()", sprintf("grafico_processos('%s')", estado)),
+    "```"
+  ), quiet = TRUE))
+}
+
+cat("\n#### Assuntos\n\n")
+cat(knitr::knit_child(text = c(
+  "```{r processos-assuntos}",
+  "assuntos_df <- processos_df |>",
+  "  select(numero_processo, assunto_nome) |>",
+  "  filter(!is.na(assunto_nome)) |>",
+  "  separate_longer_delim(assunto_nome, delim = ';') |>",
+  "  mutate(assunto_nome = str_squish(assunto_nome)) |>",
+  "  filter(assunto_nome != '') |>",
+  "  distinct(numero_processo, assunto_nome) |>",
+  "  count(assunto_nome, name = 'n', sort = TRUE) |>",
+  "  head(20)",
+  "assuntos_df |>",
+  "  grafico_barras_horizontal(",
+  "    categorias = assunto_nome,",
+  "    valores = n,",
+  "    titulo = 'Assuntos mais frequentes - ECA',",
+  "    cor = 1,",
+  "    nome_valores = 'Número de processos',",
+  "    nome_categorias = 'Assunto'",
+  "  )",
+  "```"
+), quiet = TRUE))
+
+```
+
+
+# Conselhos tutelares
+
+
+::::: {.columns}
+
+:::: {.rows width="70%"}
+
+
+```{r coropletico_conselhos_tutelares, cache=FALSE}
+#| title: "Conselhos tutelares: ano base 2023 - fonte: IBGE"
+
+# Dados --------------------------------------------------------------------
+
+load("conselhos_tutelares/cons_tut.rda")
+
+library(dplyr)
+
+
+# Malha municipal ----------------------------------------------------------
+
+malha_ct <- carregar_malha_conselhos()
+mun_geo <- malha_ct$dados
+
+
+
+# Junta os dados à malha municipal -----------------------------------------
+
+mapa_ct <- mun_geo |>
+  mutate(
+    mun = as.character(code_muni)
+  ) |>
+  left_join(
+    cons_tut |>
+      mutate(mun = as.character(mun)),
+    by = "mun"
+  )
+
+
+# Quintis ------------------------------------------------------------------
+#
+# 0 é mantido como uma categoria própria.
+# Os demais municípios são divididos em quintis.
+
+x <- mapa_ct$ct_por_pop_crianca_adolescente
+
+breaks_ct <- quantile(
+  x[
+    x > 0 &
+      !is.na(x)
+  ],
+  probs = seq(0, 1, 0.2),
+  na.rm = TRUE,
+  names = FALSE
+)
+
+# Evita problema caso dois quantis sejam exatamente iguais
+breaks_ct <- unique(breaks_ct)
+
+
+# Cria os intervalos apenas para valores positivos
+
+faixa_pos <- cut(
+  x,
+  breaks = breaks_ct,
+  include.lowest = TRUE,
+  dig.lab = 3,
+  ordered_result = TRUE
+)
+
+
+# Monta a variável final:
+# 0 + quintis positivos
+
+mapa_ct <- mapa_ct |>
+  mutate(
+    faixa_ct = case_when(
+      is.na(ct_por_pop_crianca_adolescente) ~ NA_character_,
+      ct_por_pop_crianca_adolescente == 0   ~ "0",
+      TRUE                                  ~ as.character(faixa_pos)
+    ),
+
+    faixa_ct = factor(
+      faixa_ct,
+      levels = c(
+        "0",
+        levels(faixa_pos)
+      )
+    )
+  )
+
+
+# Mapa ---------------------------------------------------------------------
+
+# Geometria de exibição preparada uma vez, compartilhada com a história.
+geojson_ct <- malha_ct$geojson
+faixas_exibicao <- levels(mapa_ct$faixa_ct)
+cores_ct <- viridisLite::viridis(length(faixas_exibicao), option = "C", direction = -1)
+
+# Rótulos explícitos para mostrar na legenda a faixa representada por cada cor.
+formatar_limite <- function(x) {
+  formatC(x, format = "fg", digits = 3,
+          decimal.mark = ",", big.mark = ".")
+}
+
+rotulos_faixas <- c(
+  "0",
+  vapply(seq_len(length(breaks_ct) - 1), function(i) {
+    limite_inferior <- formatar_limite(breaks_ct[i])
+    limite_superior <- formatar_limite(breaks_ct[i + 1])
+
+    if (i == 1) {
+      paste0("de ", limite_inferior, " a ", limite_superior)
+    } else {
+      paste0("> ", limite_inferior, " a ", limite_superior)
+    }
+  }, character(1))
+)
+
+stopifnot(length(rotulos_faixas) == length(faixas_exibicao))
+
+valores_ct <- lapply(seq_len(nrow(mapa_ct)), function(i) list(
+  name = as.character(mapa_ct$mun[i]),
+  value = if (is.na(mapa_ct$faixa_ct[i])) -1 else as.integer(mapa_ct$faixa_ct[i]) - 1,
+  municipio = as.character(mapa_ct$name_muni[i]),
+  taxa = if (is.na(mapa_ct$ct_por_pop_crianca_adolescente[i])) NULL else
+    mapa_ct$ct_por_pop_crianca_adolescente[i]))
+pedacos_ct <- c(lapply(seq_along(faixas_exibicao), function(i) list(
+  value = i - 1, label = rotulos_faixas[i], color = cores_ct[i])),
+  list(list(value = -1, label = "Sem informação", color = "red")))
+rotulos_faixas_js <- jsonlite::toJSON(
+  rotulos_faixas,
+  auto_unbox = TRUE
+)
+widget_echarts(list(
+  title = list(text = "Conselhos tutelares por população de crianças e adolescentes",
+    subtext = "Número de conselhos tutelares por 100 mil crianças e adolescentes, segundo município — Brasil, 2023",
+    textStyle = list(fontSize = 16), subtextStyle = list(fontSize = 11)),
+  tooltip = list(trigger = "item", formatter = htmlwidgets::JS(
+    "function(p){var d=p.data||{};return (d.municipio||p.name)+'<br>Conselhos por 100 mil: '+(d.taxa==null?'Sem informação':Number(d.taxa).toLocaleString('pt-BR'));}")),
+  visualMap = list(show = TRUE, type = "piecewise", pieces = pedacos_ct,
+    showLabel = TRUE, left = 10, bottom = 35,
+    text = c("Conselhos tutelares por 100 mil\ncrianças e adolescentes", ""),
+    textStyle = list(fontSize = 11),
+    formatter = htmlwidgets::JS(sprintf(
+      "function(value){var i=Number(value);if(i < 0)return 'Sem informação';return %s[i] || '';}",
+      rotulos_faixas_js))),
+  graphic = list(list(type = "text", left = 10, bottom = 5, style = list(
+    text = "Fonte: IBGE, Pesquisa de Informações Básicas Municipais (MUNIC), 2023 e Censo, 2022.", fontSize = 9))),
+  series = list(list(type = "map", map = "municipios_ct", roam = TRUE,
+    layoutCenter = list("60%", "55%"), layoutSize = "86%", aspectScale = 1,
+    scaleLimit = list(min = 0.8, max = 8),
+    itemStyle = list(borderWidth = 0), data = valores_ct))
+), 650) |>
+  echarts4r::e_map_register("municipios_ct", geojson_ct) |>
+  adicionar_elementos_cartograficos()
+
+```
+
+::::
+
+:::: {.rows width="30%"}
+
+
+```{r lista_sem_ct, cache=FALSE}
+
+library(gt)
+load("conselhos_tutelares/cons_tut.rda")
+cons_tut |>                                                                                                                    filter(num_ct == 0) |>                                                                                                         select(uf, nome_municipio) |>
+  rename(`UF` = uf, Município = nome_municipio) |>
+  arrange(UF, Município) |>
+  gt() |>
+  cols_label(UF = "UF", Município = "Município") |>
+  tab_header(title = "Municípios sem conselho tutelar ou não informado", subtitle = "Brasil, 2023") |>
+  tab_source_note(source_note = "Fonte: IBGE, Pesquisa de Informações Básicas Municipais (MUNIC), 2023.")
+
+
+```
+
+::::
+
+::::: 
+
+
+# A história em dados
+
+
+```{r historia-iframe}
+#| title: "O retrato da violência"
+
+# O scrollytelling tem CSS/JS próprios e precisa rolar em janela cheia, o que
+# é incompatível com o layout do dashboard; por isso é embutido via iframe,
+# que carrega o historia.html renderizado de forma independente.
+htmltools::div(
+  id = "historia-slot",
+  title = "O retrato da violência contra crianças e adolescentes no Brasil",
+  class = "html-widget",
+  style = "border: 0; display: block; min-height: 70vh;"
+)
+
+```
+

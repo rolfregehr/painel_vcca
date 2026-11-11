@@ -1,0 +1,17 @@
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+/publica/
+/.quarto/
+
+**/*.quarto_ipynb
+**/*_cache/
+
+# Credenciais e configurações locais.
+/.aws/
+/.codex/
+/.agents/
+.env
+.env.*
+!.env.example

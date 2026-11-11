@@ -1,0 +1,8 @@
+project:
+  type: default
+  output-dir: publica
+  render:
+    - index.qmd
+    - historia/historia.qmd
+  resources:
+    - assets/logo-datasenado.jpg
