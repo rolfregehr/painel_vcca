@@ -4,5 +4,8 @@ project:
   render:
     - index.qmd
     - historia/historia.qmd
+    - fontes/index.qmd
   resources:
     - assets/logo-datasenado.jpg
+    - fontes/*.csv
+    - fontes/coleta_airflow.json

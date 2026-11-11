@@ -81,6 +81,7 @@ library(tidyverse)
 library(scales)
 library(echarts4r)
 source("funcoes_graf.r")
+knitr::opts_chunk$set(cache.extra = unname(tools::md5sum("tabelas/sinan.rda")))
 
 # Corte pela população total do município, comum aos dois tipos de atendimento.
 populacao_minima_municipio <- 20000L
@@ -187,32 +188,6 @@ list(
 ```
 
 
-
-```{r creditos}
-#| content: valuebox
-#| title: "Fontes"
-#| cache: false
-
-meses_fontes <- c("jan", "fev", "mar", "abr", "mai", "jun",
-                  "jul", "ago", "set", "out", "nov", "dez")
-periodo_fontes <- range(viol_sexual_ca_sia_pa$competencia, na.rm = TRUE)
-periodo_fontes <- paste0(meses_fontes[month(periodo_fontes)], "/", year(periodo_fontes))
-
-list(
-  value = paste0("SIA/SUS — de ", periodo_fontes[1], " a ", periodo_fontes[2]),
-  color = "text-info"
-)
-```
-
-```{r outras-fontes}
-#| content: valuebox
-#| title: "Outras fontes"
-
-list(
-  value = "SIH/SUS · SINAN · CNJ · IBGE · MS/Ripsa",
-  color = "text-info"
-)
-```
 
 ::::
 
@@ -1115,5 +1090,18 @@ htmltools::div(
   style = "border: 0; display: block; min-height: 70vh;"
 )
 
+```
+
+# Fontes e metodologia
+
+```{r fontes-iframe}
+#| title: "Sobre os dados utilizados"
+#| cache: false
+htmltools::tags$iframe(
+  src = I("fontes/index.html"),
+  title = "Fontes, cobertura e metodologia dos dados",
+  style = "width: 100%; height: 100%; min-height: 70vh; border: 0;",
+  class = "html-widget"
+)
 ```
 

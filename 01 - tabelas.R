@@ -93,6 +93,8 @@ ds_sinan_viol <- list.files("/srv/dados_nvme/dados/pqt/sinan/",
 ## VIOL ----
 
 sinan <- open_dataset(ds_sinan_viol) |>
+  # Somente notificações com violência sexual assinalada (1 = Sim).
+  filter(VIOL_SEXU == "1") |>
   select(DT_NOTIFIC, SG_UF_OCOR, NU_IDADE_N, CS_SEXO, VIOL_MOTIV,
          AUTOR_SEXO, CICL_VID,
          REL_PAI, REL_MAE, REL_PAD, REL_MAD, REL_CONJ, REL_EXCON,

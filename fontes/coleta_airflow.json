@@ -1,0 +1,143 @@
+{
+  "consultado_em": "2026-11-11T10:34:56.277722+00:00",
+  "agenda": "0 22 * * 6",
+  "fuso": "America/Sao_Paulo",
+  "fontes": {
+    "siasus": {
+      "arquivos": 6488,
+      "primeiro_inventario": "2026-10-28T14:16:03+00:00",
+      "ultimo_inventario": "2026-11-10T19:12:50+00:00",
+      "ultimo_download": "2026-11-02T04:45:59+00:00",
+      "ultima_conversao": "2026-11-02T04:45:59+00:00",
+      "estados": [
+        {
+          "status": "convertido",
+          "arquivos": 408
+        },
+        {
+          "status": "legado_validado",
+          "arquivos": 6080
+        }
+      ],
+      "ultimas_etapas": [
+        {
+          "etapa": "validacao",
+          "iniciado_em": "2026-11-10T19:12:55+00:00",
+          "concluido_em": "2026-11-10T19:12:57+00:00",
+          "resultado": "sucesso"
+        },
+        {
+          "etapa": "processamento",
+          "iniciado_em": "2026-11-10T19:12:52+00:00",
+          "concluido_em": "2026-11-10T19:12:54+00:00",
+          "resultado": "sucesso"
+        },
+        {
+          "etapa": "inventario",
+          "iniciado_em": "2026-11-10T18:48:13+00:00",
+          "concluido_em": "2026-11-10T19:12:51+00:00",
+          "resultado": "sucesso"
+        }
+      ],
+      "padrao": "pa%"
+    },
+    "sihsus": {
+      "arquivos": 6046,
+      "primeiro_inventario": "2026-10-28T20:24:15+00:00",
+      "ultimo_inventario": "2026-11-09T13:46:03+00:00",
+      "ultimo_download": null,
+      "ultima_conversao": "2026-10-28T20:24:15+00:00",
+      "estados": [
+        {
+          "status": "legado_validado",
+          "arquivos": 6046
+        }
+      ],
+      "ultimas_etapas": [
+        {
+          "etapa": "validacao",
+          "iniciado_em": "2026-11-09T13:46:04+00:00",
+          "concluido_em": "2026-11-09T13:46:05+00:00",
+          "resultado": "sucesso"
+        },
+        {
+          "etapa": "processamento",
+          "iniciado_em": "2026-11-09T13:46:03+00:00",
+          "concluido_em": "2026-11-09T13:46:03+00:00",
+          "resultado": "sucesso"
+        },
+        {
+          "etapa": "inventario",
+          "iniciado_em": "2026-11-09T13:36:01+00:00",
+          "concluido_em": "2026-11-09T13:46:03+00:00",
+          "resultado": "sucesso"
+        }
+      ],
+      "padrao": "rd%"
+    },
+    "sinan": {
+      "arquivos": 16,
+      "primeiro_inventario": "2026-10-28T13:44:08+00:00",
+      "ultimo_inventario": "2026-11-09T13:47:25+00:00",
+      "ultimo_download": null,
+      "ultima_conversao": "2026-10-28T13:44:08+00:00",
+      "estados": [
+        {
+          "status": "legado_validado",
+          "arquivos": 16
+        }
+      ],
+      "ultimas_etapas": [
+        {
+          "etapa": "validacao",
+          "iniciado_em": "2026-11-09T13:47:27+00:00",
+          "concluido_em": "2026-11-09T13:47:27+00:00",
+          "resultado": "sucesso"
+        },
+        {
+          "etapa": "processamento",
+          "iniciado_em": "2026-11-09T13:47:26+00:00",
+          "concluido_em": "2026-11-09T13:47:26+00:00",
+          "resultado": "sucesso"
+        },
+        {
+          "etapa": "inventario",
+          "iniciado_em": "2026-11-09T13:47:04+00:00",
+          "concluido_em": "2026-11-09T13:47:25+00:00",
+          "resultado": "sucesso"
+        }
+      ],
+      "padrao": "violbr%"
+    }
+  },
+  "codigo_consultado": [
+    {
+      "arquivo": "dados_publicos_mensal_dag.py",
+      "sha256": "4bcc68b32a12c075681bc473c82a9415214cec8f74da4eacac0402f36fc9cf93"
+    },
+    {
+      "arquivo": "siasus/siasus_dag.py",
+      "sha256": "d6cad3d5f35702995de4630a912335ff6b8be9000234217b924f67f0d44f5477"
+    },
+    {
+      "arquivo": "siasus/pipeline.py",
+      "sha256": "8b3e3a402ded5c1315c831a2b084aa71d13719a3d2a48a14c5ae1a06650b5b17"
+    },
+    {
+      "arquivo": "sihsus/sihsus_dag.py",
+      "sha256": "814eac78e91b364b1edefb215a322fe76aac3c48a1f317987ef5af60e4ecf4ca"
+    },
+    {
+      "arquivo": "sihsus/pipeline.py",
+      "sha256": "27366a5ce2362fd4058da27c5b1ab0a1293548adc54840515845c2faacb7e4b4"
+    },
+    {
+      "arquivo": "sinan/sinan_dag.py",
+      "sha256": "202c201c04cb7e33d1cbcfb573aa7bdc301c569ea70326789f4b85920041be38"
+    },
+    {
+      "arquivo": "sinan/pipeline.py",
+      "sha256": "448126c2ab9019cda974e452a322a606ed9a060e0a3b67c713a9ab4c0ee25fa8"
+    }
+  ]
+}

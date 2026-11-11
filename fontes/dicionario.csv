@@ -1,0 +1,75 @@
+"fonte","campo","tipo","descricao","distintos","linhas_ausentes","percentual_volume_ausente"
+"SIA","competencia","Date","Mês da produção (SIA) ou da internação (SIH); dia 01 é convenção de agregação.",224,0,0
+"SIA","genero","character","Sexo registrado na fonte: SIA F/M; SIH 1 masculino, 3 feminino. Não mede identidade de gênero.",2,0,0
+"SIA","idade","numeric","Idade em anos: PA_IDADE no SIA; diferença entre NASC e DT_INTER no SIH.",18,0,0
+"SIA","raca_cor","character","Raça/cor registrada; códigos 01 a 05 recodificados e 99 como Sem informação.",6,0,0
+"SIA","n","integer","Frequência dos registros de origem; somar n para obter o total de saúde.",230,0,0
+"SIH","competencia","Date","Mês da produção (SIA) ou da internação (SIH); dia 01 é convenção de agregação.",224,0,0
+"SIH","genero","character","Sexo registrado na fonte: SIA F/M; SIH 1 masculino, 3 feminino. Não mede identidade de gênero.",2,0,0
+"SIH","idade","numeric","Idade em anos: PA_IDADE no SIA; diferença entre NASC e DT_INTER no SIH.",18,0,0
+"SIH","raca_cor","character","Raça/cor registrada; códigos 01 a 05 recodificados e 99 como Sem informação.",6,0,0
+"SIH","n","integer","Frequência dos registros de origem; somar n para obter o total de saúde.",6,0,0
+"SINAN","data_notific","Date","DT_NOTIFIC reduzida ao primeiro dia do mês; não representa a data da violência.",192,0,0
+"SINAN","SG_UF_OCOR","integer","Código IBGE da UF de ocorrência da violência (não a UF da notificação).",27,5164,2.124
+"SINAN","ciclo_vida","character","Vítima: Criança, menos de 12 anos; Adolescente, de 12 a 17 anos.",2,0,0
+"SINAN","motivo_violencia","character","VIOL_MOTIV recodificado; motivação registrada, diferente do tipo de violência.",9,31538,18.688
+"SINAN","autor","character","Vínculo com provável autor a partir de REL_*; mais de um vínculo vira Múltiplas relações.",20,0,0
+"SINAN","ciclo_vida_autor","character","CICL_VID do provável autor; preservadas todas as faixas etárias.",6,30957,18.534
+"SINAN","genero_autor","character","AUTOR_SEXO: masculino, feminino, ambos ou ignorado.",4,842,0.218
+"SINAN","genero_vitima","character","CS_SEXO: F/M; outros códigos convertidos para ausente.",2,59,0.014
+"SINAN","n","integer","Frequência dos registros de origem; somar n para obter o total de saúde.",48,0,0
+"CNJ","ano","integer","Ano de ajuizamento usado na consulta do DataJud.",19,0,0
+"CNJ","uf","character","UF do tribunal no CNJ; UF municipal nas demais bases.",27,0,0
+"CNJ","index","character","Índice/alias do tribunal na API pública do DataJud.",27,0,0
+"CNJ","id_elasticsearch","character","Identificador do documento retornado pela API; deduplicação com index.",465950,0,0
+"CNJ","score","numeric","Pontuação da busca da API; pode estar ausente ao ordenar por timestamp.",0,465950,100
+"CNJ","id","character","Chave do DataJud; pode distinguir classe, grau e órgão de um mesmo processo.",465950,0,0
+"CNJ","tribunal","character","Sigla do tribunal de origem.",27,0,0
+"CNJ","grau","character","Grau/instância: G1, G2, JE ou TR, conforme os registros.",4,0,0
+"CNJ","numero_processo","character","Número único do processo preservado como texto; base da contagem de processos.",442001,0,0
+"CNJ","data_ajuizamento","character","Data de ajuizamento na capa; painel interpreta os oito primeiros caracteres AAAAMMDD.",316594,0,0
+"CNJ","nivel_sigilo","integer","Nível de sigilo retornado nos metadados públicos; o acervo não inclui todos os processos sigilosos.",1,0,0
+"CNJ","assunto_codigo","character","Códigos de assuntos separados por ponto e vírgula.",25974,0,0
+"CNJ","assunto_nome","character","Nomes dos assuntos separados por ponto e vírgula; contagens por assunto não são aditivas.",24491,4557,0.978
+"CNJ","orgao_codigo","character","Código do órgão julgador.",9380,0,0
+"CNJ","orgao_nome","character","Nome do órgão julgador.",10035,62,0.013
+"CNJ","municipio_ibge","character","Município do órgão julgador; não identifica a residência da vítima.",2742,19710,4.23
+"CNJ","classe_codigo","character","Código da classe processual.",354,0,0
+"CNJ","classe_nome","character","Nome da classe processual.",338,0,0
+"CNJ","sistema_codigo","character","Código do sistema processual.",9,7,0.002
+"CNJ","sistema_nome","character","Nome do sistema processual.",11,7,0.002
+"CNJ","formato_codigo","character","Código do formato do processo.",2,52,0.011
+"CNJ","formato_nome","character","Nome do formato, como eletrônico ou físico.",2,52,0.011
+"CNJ","ultima_atualizacao","character","Data/hora de atualização informada pelo DataJud; não é a data de download local.",465051,0,0
+"CNJ","timestamp","character","Timestamp do registro na API, usado na paginação da coleta.",465108,0,0
+"MUNIC","mun","character","Código IBGE municipal de sete dígitos.",5570,0,0
+"MUNIC","nome_municipio","character","Nome do município.",5297,0,0
+"MUNIC","uf","character","UF do tribunal no CNJ; UF municipal nas demais bases.",27,0,0
+"MUNIC","nome_uf","character","Nome da UF.",27,0,0
+"MUNIC","num_crianca","numeric","População de 0 a 11 anos, Censo 2022, SIDRA 9606.",3656,0,0
+"MUNIC","num_adolescente","numeric","População de 12 a 17 anos, Censo 2022, SIDRA 9606.",2121,0,0
+"MUNIC","num_crianca_adolescente","numeric","Soma da população de 0 a 17 anos do Censo 2022.",3901,0,0
+"MUNIC","num_ct","numeric","MDHU612, número de conselhos tutelares em 2023; '-' e Não informou convertidos para zero.",15,0,0
+"MUNIC","ct_por_pop_crianca","numeric","Conselhos por mil crianças (0–11 anos).",3646,0,0
+"MUNIC","ct_por_pop_adolescente","numeric","Conselhos por mil adolescentes (12–17 anos).",2134,0,0
+"MUNIC","ct_por_pop_crianca_adolescente","numeric","Conselhos por mil habitantes de 0–17 anos; a história multiplica por 100.",3903,0,0
+"Taxa_SIA","mun","character","Código IBGE municipal de sete dígitos.",5571,0,0
+"Taxa_SIA","nome_municipio","character","Nome do município.",5298,0,0
+"Taxa_SIA","uf","character","UF do tribunal no CNJ; UF municipal nas demais bases.",27,0,0
+"Taxa_SIA","inicio","Date","Primeiro dia da janela comum de 12 meses para as taxas.",1,0,0
+"Taxa_SIA","fim","Date","Último dia da janela das taxas.",1,0,0
+"Taxa_SIA","ano_populacao","integer","Ano de referência do denominador populacional (2025).",1,0,0
+"Taxa_SIA","pop_total","integer","População de todas as idades, ambos os sexos; corte dos rankings >= 20 mil.",5102,0,0
+"Taxa_SIA","pop_crianca_adolescente","integer","População de 0 a 17 anos, ambos os sexos, arquivo POP25.dbf.",4119,0,0
+"Taxa_SIA","n","integer","Frequência dos registros de origem; somar n para obter o total de saúde.",144,0,0
+"Taxa_SIA","taxa_100mil","numeric","100.000 vezes n dividido pela população de 0–17 anos; frequência de registros, não risco individual.",1654,0,0
+"Taxa_SIH","mun","character","Código IBGE municipal de sete dígitos.",5571,0,0
+"Taxa_SIH","nome_municipio","character","Nome do município.",5298,0,0
+"Taxa_SIH","uf","character","UF do tribunal no CNJ; UF municipal nas demais bases.",27,0,0
+"Taxa_SIH","inicio","Date","Primeiro dia da janela comum de 12 meses para as taxas.",1,0,0
+"Taxa_SIH","fim","Date","Último dia da janela das taxas.",1,0,0
+"Taxa_SIH","ano_populacao","integer","Ano de referência do denominador populacional (2025).",1,0,0
+"Taxa_SIH","pop_total","integer","População de todas as idades, ambos os sexos; corte dos rankings >= 20 mil.",5102,0,0
+"Taxa_SIH","pop_crianca_adolescente","integer","População de 0 a 17 anos, ambos os sexos, arquivo POP25.dbf.",4119,0,0
+"Taxa_SIH","n","integer","Frequência dos registros de origem; somar n para obter o total de saúde.",16,0,0
+"Taxa_SIH","taxa_100mil","numeric","100.000 vezes n dividido pela população de 0–17 anos; frequência de registros, não risco individual.",249,0,0

@@ -1,0 +1,221 @@
+---
+title: "Fontes e metodologia"
+subtitle: "Cobertura, critérios de seleção e qualidade dos dados usados no painel"
+lang: pt-BR
+format:
+  html:
+    toc: true
+    toc-title: "Nesta página"
+    toc-depth: 2
+    embed-resources: true
+    theme: default
+    include-in-header:
+      text: |
+        <style>
+        body {color:#263b4b;background:#f8fafc;font-family:system-ui,sans-serif;line-height:1.65}
+        h1,h2,h3 {color:#005b9e} h2 {margin-top:2.5rem;border-bottom:2px solid #dce6ef;padding-bottom:.45rem}
+        main {max-width:1100px} .tabela-rolagem {overflow-x:auto;background:white;border:1px solid #dce6ef;border-radius:7px;margin:1rem 0}
+        table {font-size:.86rem;width:100%;margin:0} th,td {padding:.65rem;vertical-align:top;min-width:95px}
+        th {background:#edf3f8} tr:nth-child(even) {background:#f8fafc}
+        .nota {padding:1rem 1.2rem;border-left:4px solid #faa731;background:#fff6e6;margin:1rem 0}
+        details {background:white;border:1px solid #dce6ef;border-radius:7px;padding:1rem;margin:1rem 0}
+        summary {font-weight:600;cursor:pointer;color:#005b9e} a {overflow-wrap:anywhere} code {overflow-wrap:anywhere}
+        @media(max-width:700px){body {font-size:.95rem} th,td{padding:.45rem} main {padding:0 .8rem}}
+        </style>
+execute:
+  echo: false
+  warning: false
+  message: false
+  cache: false
+---
+
+```{r setup}
+source("metadados.R", local = TRUE)
+```
+
+Esta página descreve a versão dos arquivos efetivamente utilizada no painel. Os períodos, volumes e indicadores de preenchimento são recalculados a cada renderização. **Documentação gerada em `r format(Sys.time(), "%d/%m/%Y às %H:%M", tz = "America/Sao_Paulo")` (horário de Brasília).**
+
+::: {.nota}
+**O que cada fonte representa.** Sinan: notificações com violência sexual assinalada e vítimas de 0 a 17 anos. SIA e SIH: registros de saúde selecionados por diagnóstico e idade. CNJ: processos com assuntos relacionados ao ECA, em diferentes graus, sem seleção exclusiva de violência sexual. MUNIC: estrutura dos conselhos tutelares. Esses totais têm significados diferentes e não devem ser somados.
+:::
+
+## Cobertura e volume
+
+```{r resumo, results='asis'}
+tabela(resumo |> rename(Fonte = fonte, `Linhas da tabela` = linhas, Variáveis = variaveis,
+                       Volume = volume, Unidade = unidade, `Data mínima` = data_minima, `Data máxima` = data_maxima))
+```
+
+SIA, SIH e Sinan são tabelas agregadas: **o total é a soma de `n`**, e não o número de linhas. No CNJ, volume significa números de processo distintos no conjunto; a soma dos totais mensais pode diferir, se um mesmo número aparecer com datas de ajuizamento em meses diferentes. A presença de registros em um mês ou ano não comprova completude da base.
+
+O primeiro dia do mês nas tabelas de saúde é uma convenção de agregação. Por isso, “01/08/2026” significa competência ou mês de agosto, sem informar que todos os eventos ocorreram no dia 1. MUNIC e Censo são fotografias de anos de referência, sem uma série mensal.
+
+## Sinan — violência sexual
+
+**Responsável:** Ministério da Saúde, Sistema de Informação de Agravos de Notificação. **Arquivo público:** família `VIOLBR`, violência interpessoal/autoprovocada. **Período utilizado:** `r periodo("SINAN")`. **Total:** `r fmt(sum(bases$SINAN$n))` notificações.
+
+**Acesso:** [transferência de arquivos do DATASUS](https://datasus.saude.gov.br/transferencia-de-arquivos/), diretório `ftp://ftp.datasus.gov.br/dissemin/publicos/SINAN/DADOS/FINAIS`. O pipeline consulta esse diretório e o painel seleciona os Parquets cujo nome começa por `violbr`.
+
+**Seleção aplicada antes da agregação:** `VIOL_SEXU == "1"` (Sim) e idade da vítima menor que 18 anos, com idade válida. Respostas “Não”, “Ignorado” e ausentes no campo de violência sexual ficam fora. A base de origem pode registrar vários tipos de violência na mesma ficha; o filtro exige que violência sexual esteja assinalada, sem excluir outras violências concomitantes.
+
+A idade é derivada de `NU_IDADE_N`: o primeiro dígito identifica horas, dias, meses ou anos. Horas e dias são convertidos com 365,25 dias por ano; meses, por 12. Códigos de idade ignorada não são tratados como idade válida. Crianças têm menos de 12 anos; adolescentes, de 12 a 17. A idade do provável autor não é limitada a essas faixas.
+
+**Tempo e território:** `DT_NOTIFIC` define o mês de preenchimento da notificação, e `SG_UF_OCOR` define a UF de ocorrência. Não são, respectivamente, data da violência e UF da unidade notificadora. O painel não usa município da vítima nesse recorte.
+
+**Transformações:** sexo da vítima (`CS_SEXO`) e sexo do autor (`AUTOR_SEXO`) são recodificados; os campos não medem identidade de gênero. `VIOL_MOTIV` informa a motivação registrada, não o tipo de violência. Códigos 9, 88 e 99 são reunidos como “Não detalhado / sem informação”; valores ausentes continuam ausentes. Vários vínculos `REL_*` assinalados viram “Múltiplas relações”; nenhum vínculo assinalado vira “Não informado”. Esse agrupamento evita contar a mesma notificação uma vez por vínculo, mas não revela quantos autores participaram.
+
+**Unidade e limites:** uma notificação não identifica uma pessoa única nem comprova autoria. Não há deduplicação por pessoa no preparo; fichas distintas podem se referir à mesma vítima. O total depende dos registros disponibilizados, do preenchimento e da notificação. Ausência de registro não demonstra ausência de violência. A tabela agregada não preserva `VIOL_SEXU`: a seleção é feita na origem, no script `01 - tabelas.R`.
+
+**Dicionário de referência:** [Sinan Net — Violência Interpessoal/Autoprovocada, versão 5.0/Patch 5.1](https://portalsinan.saude.gov.br/images/documentos/Agravos/via/DIC_DADOS_NET_Violencias_v5.pdf). A versão pública pode disponibilizar um subconjunto dos campos do sistema.
+
+## SIA/SUS — produção ambulatorial
+
+**Responsável:** Ministério da Saúde/DATASUS. **Família:** PA, produção ambulatorial. **Período da tabela:** `r periodo("SIA")`. **Total da tabela:** `r fmt(sum(bases$SIA$n))` registros.
+
+**Acesso:** [transferência de arquivos](https://datasus.saude.gov.br/transferencia-de-arquivos/), diretório `ftp://ftp.datasus.gov.br/dissemin/publicos/SIASUS/200801_/Dados`. O preparo lê arquivos locais com padrão `^pa[a-z]{2}[0-9]{4}`.
+
+**Recorte:** `PA_CIDPRI` contendo `T742` ou `Y05` e `PA_IDADE` entre 0 e 17. O código usa busca por essas sequências, sem exigir igualdade exata; o diagnóstico é selecionado no campo principal. `PA_CMP` define o mês da competência. A tabela agrega por competência, sexo, idade e raça/cor e conta linhas da fonte com `n()`.
+
+**Interpretação:** conta registros de produção selecionados, não pacientes únicos, procedimentos ponderados por quantidade ou todos os episódios de violência sexual. Diagnósticos secundários não participam da seleção. As categorias de raça/cor 01–05 são rotuladas; 99 vira “Sem informação”; outros códigos ficam ausentes.
+
+**Período efetivamente mostrado:** a primeira aba ambulatorial e a história selecionam competências **a partir de janeiro de 2015**, embora a tabela preserve dados anteriores. Os gráficos anuais da história excluem anos nas extremidades quando o período não começa em janeiro ou não termina em dezembro.
+
+## SIH/SUS — registros hospitalares
+
+**Responsável:** Ministério da Saúde/DATASUS. **Família:** RD, AIH reduzida. **Período da tabela:** `r periodo("SIH")`. **Total:** `r fmt(sum(bases$SIH$n))` registros.
+
+**Acesso:** [transferência de arquivos](https://datasus.saude.gov.br/transferencia-de-arquivos/), diretório `ftp://ftp.datasus.gov.br/dissemin/publicos/SIHSUS/200801_/Dados`. O preparo lê arquivos locais com padrão `^rd[a-z]{2}[0-9]{4}`.
+
+**Recorte:** `DIAG_PRINC` contendo `T742` ou `Y05`, idade calculada pela diferença entre nascimento (`NASC`) e internação (`DT_INTER`), em anos completos, entre 0 e 17. O mês da série é o de **internação**, não necessariamente o da competência do arquivo. Isso permite que a menor data de internação anteceda 2008, mesmo em arquivos do diretório `200801_`.
+
+Sexo é codificado como 1 masculino e 3 feminino. O preparo agrega por mês da internação, sexo, idade e raça/cor. O painel conta registros, sem deduplicar pessoas, internações relacionadas ou AIHs de continuidade; não estima o conjunto de internações da rede privada fora do SUS.
+
+**Recortes de apresentação:** a aba hospitalar agrega em trimestres e exclui o trimestre mais recente presente. Os gráficos anuais da história usam anos completos nas extremidades. Os números de abertura da história usam toda a tabela; a mediana de idade é ponderada por `n`.
+
+## Taxas municipais e população de referência
+
+**Janela comum:** `r format(min(bases$Taxa_SIA$inicio), "%d/%m/%Y")` a `r format(max(bases$Taxa_SIA$fim), "%d/%m/%Y")`. São 12 meses encerrados na menor das últimas competências de SIA e SIH. O fim é o último dia desse mês.
+
+**Numeradores:** registros dos mesmos diagnósticos e idades por município de residência — `PA_MUNPCN` no SIA e `MUNIC_RES` no SIH. Não representam o município do estabelecimento. Códigos do DF são consolidados no código de Brasília. Ausência de numerador na junção vira zero; isso não distingue ausência real de registros de problemas de cobertura ou correspondência de códigos.
+
+**Denominador:** população de 0 a 17 anos, ambos os sexos, referência **2025**, extraída de `POP25.dbf`, no [arquivo público POPSBR25.zip do DATASUS](ftp://ftp.datasus.gov.br/dissemin/publicos/IBGE/POPSVS/POPSBR25.zip). O projeto atribui a série a MS/Ripsa, com dados do IBGE. A soma inclui sexo 1 e 2, idades de 0 a 17; a população total inclui todas as idades desses sexos. O denominador fica fixo em 2025 para a janela apresentada; não é atualizado mês a mês.
+
+**Fórmula:** `taxa_100mil = 100000 × número de registros / população de 0 a 17 anos`. É uma taxa de registros, sem padronização etária e sem deduplicação de pessoas. Os rankings usam somente municípios com **população total de pelo menos 20 mil habitantes**, enquanto o denominador da taxa continua sendo a população de 0 a 17 anos. Municípios menores ficam fora dos rankings.
+
+Nomes e UFs são obtidos na [API de localidades do IBGE](https://servicodados.ibge.gov.br/api/docs/localidades), rota [`/api/v1/localidades/municipios`](https://servicodados.ibge.gov.br/api/v1/localidades/municipios). O arquivo local de população contempla `r nrow(bases$Taxa_SIA)` municípios e soma `r fmt(sum(bases$Taxa_SIA$pop_crianca_adolescente))` habitantes de 0 a 17 anos. A malha de 2025 inclui Boa Esperança do Norte, diferindo da malha de 2022 dos conselhos.
+
+## CNJ/DataJud — processos relacionados ao ECA
+
+**Responsável:** Conselho Nacional de Justiça. **Período de ajuizamento:** `r format(min(datas$CNJ), "%d/%m/%Y")` a `r format(max(datas$CNJ), "%d/%m/%Y")`. **Documentos da API:** `r fmt(nrow(bases$CNJ))`. **Números de processo distintos:** `r fmt(n_distinct(bases$CNJ$numero_processo))`.
+
+**Acesso:** [API pública do DataJud](https://www.cnj.jus.br/sistemas/datajud/api-publica/), por requisições POST para `https://api-publica.datajud.cnj.jus.br/api_publica_{tribunal}/_search`. A autenticação utiliza a chave pública disponibilizada pelo CNJ, conforme a [documentação de acesso](https://datajud-wiki.cnj.jus.br/api-publica/acesso/). A página não reproduz chaves de acesso.
+
+**Consulta identificada no projeto de origem:** `consulta_datajud_eca.R`. Seleciona códigos de assuntos cujo “Dispositivo legal” contém “ECA” na tabela `79_Tabela_Assuntos_Justica_Estadual_1_Grau.ods`. Consulta os 27 tribunais estaduais, para ajuizamentos de 2008 a 2026, em páginas de 1.000 registros, com `search_after` e ordenação por `@timestamp`. Há checkpoints por UF e ano e consolidação por `index + id_elasticsearch`. O nome da tabela de assuntos contém “1_Grau”, mas a consulta **não aplica filtro por grau**.
+
+```{r graus, results='asis'}
+tabela(bases$CNJ |> count(grau, name = "Documentos da API") |> rename(Grau = grau))
+```
+
+**Recorte temático:** processos com assuntos relacionados ao ECA, incluindo temas além de violência sexual. Não é uma contagem de vítimas, condenações ou crimes sexuais. O ranking separa assuntos por ponto e vírgula e conta uma vez cada combinação processo–assunto; um processo pode aparecer em várias barras. O conjunto pode conter múltiplos documentos da API para um mesmo número de processo.
+
+**Tempo e território:** a série usa data de ajuizamento, lida como `AAAAMMDD` nos oito primeiros caracteres. A UF vem do tribunal consultado; não identifica o local da violência nem a residência da vítima. A comparação com o Sinan não relaciona pessoas ou casos, e os recortes temáticos são diferentes.
+
+**Atualização informada na API:** `r min(bases$CNJ$ultima_atualizacao, na.rm = TRUE)` a `r max(bases$CNJ$ultima_atualizacao, na.rm = TRUE)`. São datas dos documentos, não datas comprovadas de coleta local. Os checkpoints existentes podem ser reutilizados pelo coletor, sem refazer consultas; não há atualização automática do CNJ na DAG de bases consultada. Todos os documentos deste arquivo têm nível de sigilo `r paste(sort(unique(bases$CNJ$nivel_sigilo)), collapse = ", ")`; a base pública não permite inferir o volume de processos não disponibilizados.
+
+Referências: [endpoints oficiais](https://datajud-wiki.cnj.jus.br/api-publica/endpoints/) e [glossário de dados](https://datajud-wiki.cnj.jus.br/api-publica/glossario/).
+
+## IBGE — conselhos tutelares, Censo e cartografia
+
+**MUNIC 2023:** [Pesquisa de Informações Básicas Municipais](https://www.ibge.gov.br/estatisticas/sociais/protecao-social/10586-pesquisa-de-informacoes-basicas-municipais.html). O preparo baixa [`Base_MUNIC_2023.xlsx`](https://ftp.ibge.gov.br/Perfil_Municipios/2023/Base_de_Dados/Base_MUNIC_2023.xlsx), usa a aba “Direitos Humanos” e a variável **MDHU612**, número de conselhos tutelares. O ano de referência é 2023; não é a situação atual de cada município.
+
+**Censo Demográfico 2022:** população residente por idade, ambos os sexos e total de cor/raça, obtida pela [tabela SIDRA 9606](https://sidra.ibge.gov.br/tabela/9606). A consulta usa variável 93 e categorias de idade de 0–4, 5–9, 10, 11, 12, 13, 14 e 15–17 anos. Crianças: 0–11; adolescentes: 12–17.
+
+**Cálculo:** número de conselhos dividido pela população da faixa, multiplicado por 1.000 na tabela. A história apresenta conselhos por **100 mil** crianças e adolescentes, multiplicando esse indicador por 100. O numerador é de 2023 e a população de 2022; as referências temporais são diferentes.
+
+**Preenchimento:** o preparo converte “Não informou” e “-” para zero. Portanto, a categoria zero reúne municípios sem conselhos e respostas sem informação; não comprova ausência de conselho. São `r fmt(sum(bases$MUNIC$num_ct == 0, na.rm = TRUE))` municípios nessa categoria. O total preparado soma `r fmt(sum(bases$MUNIC$num_ct, na.rm = TRUE))` conselhos em `r fmt(nrow(bases$MUNIC))` municípios.
+
+**Cartografia:** malhas do IBGE distribuídas pelo [geobr/Ipea](https://ipeagit.github.io/geobr/). Conselhos: limites de 2022, 5.570 municípios; taxas de saúde: limites de 2025, 5.571 municípios; mapa estadual da história: limites de 2022. Para exibição, os polígonos são simplificados em projeção métrica (tolerância de 500 m) e convertidos para longitude/latitude, com quatro casas decimais no GeoJSON. A simplificação é visual; não redefine os numeradores ou denominadores. Códigos municipais são preservados como texto; a junção de códigos SUS e IBGE usa os seis primeiros dígitos no preparo das taxas.
+
+## Coleta, atualização e rastreabilidade
+
+**Fluxo de saúde consultado:** DAGs `siasus`, `sihsus` e `sinan`, acionadas pelo orquestrador `dados_publicos_mensal`. Apesar do nome “mensal”, a expressão efetiva **`0 22 * * 6` corresponde a sábados às 22h, no fuso America/Sao_Paulo**. As DAGs individuais têm `schedule=None`; o orquestrador as dispara em sequência, sem recomposição automática de todos os períodos passados (`catchup=False`). Agenda configurada não prova execução bem-sucedida.
+
+Cada fluxo verifica o ambiente, inventaria o FTP em SQLite, baixa arquivos novos ou alterados, converte DBC em Parquet e valida o resultado. Arquivos DBC temporários são descartados após validação. O manifesto registra tamanho/data remotos e estados como `convertido` e `legado_validado`. Neste último caso, o arquivo já existia localmente: a entrada no manifesto não comprova a data do download original.
+
+**Fotografia dos manifestos consultada em `r coleta$consultado_em` (UTC):** somente PA no SIA, RD no SIH e VIOLBR no Sinan, com arquivos ativos. Os inventários abrangem arquivos da família inteira, não somente o recorte etário e diagnóstico do painel.
+
+```{r coleta, results='asis'}
+tabela(coleta_resumo)
+```
+
+Um inventário recente **não significa que a tabela agregada do painel foi recalculada naquela data**. As DAGs atualizam os Parquets; o script `01 - tabelas.R` produz as tabelas do painel em etapa separada. A renderização recalcula os metadados da versão local, sem baixar novamente as bases. A página conserva um resumo dos manifestos para poder ser renderizada em outro computador, sem acesso ao Airflow.
+
+**Datas que não devem ser confundidas:** data do evento ou referência; data de atualização informada pela fonte; data de inventário/download/conversão; data de modificação do arquivo local; data de renderização desta página. Datas locais podem mudar ao copiar arquivos ou clonar o Git. Para bases sem registro de acesso preservado (MUNIC, população, cartografia e coleta judicial original), a data exata de download não está comprovada.
+
+## Cobertura anual, territorial e preenchimento
+
+<details>
+<summary>Volumes por ano e número de meses com registros</summary>
+
+```{r anual, results='asis'}
+tabela(anual |> rename(Fonte = fonte, Ano = ano, Volume = volume, `Meses com registros` = meses_com_registros))
+```
+
+Doze meses com registros não asseguram completude; menos de doze pode decorrer de período parcial, ausência de registros ou falta de cobertura. Meses sem linhas são preservados como ausentes no CSV mensal; não são preenchidos artificialmente com zero.
+
+</details>
+
+<details>
+<summary>Períodos e volumes por UF — Sinan e CNJ</summary>
+
+```{r territorio, results='asis'}
+tabela(territorio)
+```
+
+Sinan: UF de ocorrência e soma de notificações. CNJ: UF do tribunal e processos distintos em cada UF. As séries por UF podem começar e terminar em datas diferentes. Totais por UF do CNJ não devem ser presumidos aditivos sem verificar a repetição de números.
+
+</details>
+
+<details>
+<summary>Dicionário de todas as variáveis e ausência de informação</summary>
+
+Nos dados agregados de saúde, o percentual de ausência é ponderado por `n`; nas demais tabelas, é a proporção de linhas. A métrica conta `NA` e texto vazio. Rótulos como “Ignorado”, “Não informado” e “Não detalhado” **não são contados como NA**; o seu volume é detalhado abaixo.
+
+```{r dicionario, results='asis'}
+tabela(dicionario)
+```
+
+</details>
+
+```{r categorias-ignoradas, results='asis'}
+qualidade <- bind_rows(lapply(c("motivo_violencia", "autor", "ciclo_vida_autor", "genero_autor", "genero_vitima"), function(campo) {
+  d <- bases$SINAN
+  x <- d[[campo]]
+  sem <- is.na(x) | x %in% c("Não detalhado / sem informação", "Não informado", "Ignorado")
+  tibble(Campo = campo, `Notificações sem detalhamento` = sum(d$n[sem]),
+         Percentual = round(100 * sum(d$n[sem]) / sum(d$n), 2))
+}))
+tabela(qualidade)
+```
+
+## Arquivos e dados para conferência
+
+Os downloads abaixo contêm metadados e agregações de conferência, sem reproduzir identificadores individuais de processos. CSV em UTF-8, separado por vírgula; números decimais usam ponto.
+
+* [Resumo das fontes](resumo.csv)
+* [Séries mensais](mensal.csv) e [volumes anuais](anual.csv)
+* [Cobertura por UF](territorio.csv)
+* [Dicionário e preenchimento](dicionario.csv)
+* [Inventário dos arquivos e hashes MD5](inventario.csv)
+* [Fotografia dos manifestos do Airflow e hashes SHA-256 dos códigos consultados](coleta_airflow.json)
+
+<details>
+<summary>Arquivos usados, tamanhos, modificação local e hashes</summary>
+
+```{r inventario, results='asis'}
+tabela(inventario)
+```
+
+O hash permite conferir se dois arquivos têm o mesmo conteúdo; não comprova a data do acesso à fonte nem a completude dos registros. A reprodução dos agregados de saúde depende dos arquivos Parquet de origem e da população utilizada. O recorte é implementado em `01 - tabelas.R`; a história é calculada a partir das mesmas tabelas do painel.
+
+</details>

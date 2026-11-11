@@ -1,5 +1,5 @@
 ---
-pagetitle: "O retrato da violência contra crianças e adolescentes no Brasil"
+pagetitle: "O retrato da violência sexual contra crianças e adolescentes no Brasil"
 lang: pt-BR
 format:
   html:
@@ -111,7 +111,6 @@ load("../tabelas/sih_viol_sexual")
 load("../tabelas/viol_sexual_ca_sia_pa.rda")
 
 fmt_int <- function(x) format(round(x), big.mark = ".", decimal.mark = ",")
-fmt_mi  <- function(x) sub("\\.", ",", format(round(x / 1e6, 1), nsmall = 1))
 fmt_mil <- function(x) format(round(x / 1e3), big.mark = ".", decimal.mark = ",")
 fmt_pct <- function(x, d = 1) paste0(sub("\\.", ",", format(round(100 * x, d), nsmall = d)), "%")
 
@@ -232,17 +231,17 @@ pct_sexismo_f <- ca |> filter(motivo_violencia == "Sexismo") |>
 
 ::: {.hero data-cena="-1"}
 
-<p class="hero__marca">DataSenado · Painel de Violência Interpessoal e Autoprovocada</p>
+<p class="hero__marca">DataSenado · Painel de Violência Sexual</p>
 
-# O retrato da violência contra crianças e adolescentes no Brasil
+# O retrato da violência sexual contra crianças e adolescentes no Brasil
 
-<p class="hero__lead">Uma viagem guiada pelos dados oficiais — Sinan, SIA, SIH, CNJ e MUNIC/IBGE — sobre a violência que atinge quem tem até 17 anos. As cinco bases permitem acompanhar os registros de violência, o atendimento na saúde, os processos judiciais e a distribuição dos conselhos tutelares.</p>
+<p class="hero__lead">Uma viagem guiada pelos dados oficiais — Sinan, SIA, SIH, CNJ e MUNIC/IBGE — sobre a violência sexual que atinge quem tem até 17 anos. Sinan, SIA e SIH retratam notificações e registros de saúde. Os dados judiciais abrangem assuntos do ECA, e a MUNIC descreve a estrutura dos conselhos tutelares.</p>
 
 <div class="hero__cartoes">
-<div class="cartao"><b>`r fmt_mi(tot_sinan)` milhões</b><span>notificações de violência contra crianças e adolescentes no Sinan, `r periodo_sinan`</span></div>
+<div class="cartao"><b>`r fmt_mil(tot_sinan)` mil</b><span>notificações de violência sexual contra crianças e adolescentes no Sinan, `r periodo_sinan`</span></div>
 <div class="cartao"><b>`r fmt_mil(tot_sia)` mil</b><span>registros ambulatoriais por violência sexual em crianças e adolescentes (SIA/SUS), `r periodo_sia`</span></div>
 <div class="cartao"><b>`r fmt_mil(tot_sih)` mil</b><span>registros hospitalares por violência sexual em crianças e adolescentes (SIH/SUS), `r periodo_sih`</span></div>
-<div class="cartao"><b>`r fmt_mil(tot_proc)` mil</b><span>processos na Justiça estadual de 1º grau com temas ligados a crianças e adolescentes (CNJ), `r periodo_cnj`</span></div>
+<div class="cartao"><b>`r fmt_mil(tot_proc)` mil</b><span>processos na Justiça estadual com assuntos ligados ao ECA (CNJ; diferentes graus), `r periodo_cnj`</span></div>
 </div>
 
 <p class="hero__dica">↓ role para começar a história</p>
@@ -256,9 +255,9 @@ pct_sexismo_f <- ca |> filter(motivo_violencia == "Sexismo") |>
 ::: {.step data-cena="0"}
 ::: {.step__inner}
 <p class="step__eyebrow">O panorama</p>
-## `r fmt_mi(tot_sinan)` milhões de notificações
+## `r fmt_mil(tot_sinan)` mil notificações de violência sexual
 
-No período `r periodo_sinan`, o Sistema de Informação de Agravos de Notificação (Sinan) reúne <span class="hl">`r fmt_int(tot_sinan)` registros</span> de violência interpessoal e autoprovocada envolvendo crianças e adolescentes.
+No período `r periodo_sinan`, o Sistema de Informação de Agravos de Notificação (Sinan) reúne <span class="hl">`r fmt_int(tot_sinan)` registros</span> com violência sexual assinalada na ficha (`VIOL_SEXU = 1`), envolvendo vítimas de 0 a 17 anos. Uma notificação pode registrar também outros tipos de violência.
 
 O maior total anual da série disponível aparece em <span class="hl">`r sinan_pico$ano`</span>, com <span class="hl">`r fmt_int(sinan_pico$n)` notificações</span>. A variação dos registros pode refletir mudanças na ocorrência, na detecção e na notificação da violência.
 
@@ -297,7 +296,7 @@ Entre os motivos detalhados, <span class="hl">`r motivos_det$motivo_violencia[1]
 <p class="step__eyebrow">Os agressores</p>
 ## Quem aparece como autor
 
-Entre os vínculos registrados, aparecem a <span class="azul">própria pessoa</span> (`r fmt_int(sum(autores_ca$n[autores_ca$autor == "Própria pessoa"]))` notificações), a <span class="hl">mãe</span> (`r fmt_int(sum(autores_ca$n[autores_ca$autor == "Mãe"]))`) e o <span class="hl">pai</span> (`r fmt_int(sum(autores_ca$n[autores_ca$autor == "Pai"]))`).
+Os vínculos mais frequentes são <span class="hl">`r autores_ca$autor[1]`</span> (`r fmt_int(autores_ca$n[1])` notificações), <span class="hl">`r autores_ca$autor[2]`</span> (`r fmt_int(autores_ca$n[2])`) e <span class="hl">`r autores_ca$autor[3]`</span> (`r fmt_int(autores_ca$n[3])`). Esses vínculos descrevem o provável autor informado na ficha, sem constituir comprovação judicial.
 
 Somando pais, mães, padrastos, madrastas, filhos e irmãos, os registros com um único vínculo familiar assinalado representam <span class="hl">`r fmt_pct(n_familiares/tot_ca)` das notificações</span> de crianças e adolescentes.
 
@@ -375,7 +374,7 @@ O sexo feminino corresponde a <span class="hl">`r fmt_pct(pct_sih_f)` dos regist
 <p class="step__eyebrow">A Justiça</p>
 ## `r fmt_mil(tot_proc)` mil processos na série disponível
 
-Na Justiça estadual de 1º grau, foram <span class="hl">`r fmt_int(tot_proc)` processos</span> ajuizados no período `r periodo_cnj` com temas ligados a crianças e adolescentes. Desse total, <span class="hl">`r fmt_int(tot_eca)` (`r fmt_pct(tot_eca/tot_proc)`)</span> têm assunto relacionado ao Estatuto da Criança e do Adolescente.
+Na Justiça estadual, foram <span class="hl">`r fmt_int(tot_proc)` processos</span> ajuizados no período `r periodo_cnj` selecionados por assuntos associados ao ECA, com registros de diferentes graus. O recorte não é exclusivo de violência sexual. Desse total, <span class="hl">`r fmt_int(tot_eca)` (`r fmt_pct(tot_eca/tot_proc)`)</span> têm assunto relacionado ao Estatuto da Criança e do Adolescente.
 
 Entre os anos completos disponíveis, o maior volume aparece em <span class="hl">`r cnj_pico$ano`</span>, com <span class="hl">`r fmt_int(cnj_pico$n)` processos</span>.
 
@@ -401,7 +400,7 @@ O ranking reúne os assuntos registrados nos processos selecionados. Um mesmo pr
 <p class="step__eyebrow">Duas curvas</p>
 ## Saúde e Justiça em séries distintas
 
-O gráfico coloca lado a lado os totais mensais de processos judiciais e notificações de violência. As fontes têm unidades de contagem e períodos de cobertura diferentes: processos não correspondem diretamente às notificações do Sinan.
+O gráfico coloca lado a lado os totais mensais de processos com assuntos do ECA e notificações de violência sexual contra crianças e adolescentes. As fontes têm unidades de contagem e períodos de cobertura diferentes: processos não correspondem diretamente às notificações do Sinan.
 
 A comparação permite observar tendências ao longo do tempo. Ela não estabelece que uma notificação gerou um processo, nem mede correlação ou defasagem entre as séries.
 
@@ -434,7 +433,7 @@ A cobertura é apresentada em conselhos por 100 mil crianças e adolescentes, us
 cena0 <- sinan_ano |>
   grafico_linha(
     ano, n,
-    titulo = "Notificações de violência no Sinan",
+    titulo = "Notificações de violência sexual no Sinan",
     subtitulo = paste("Brasil,", periodo_sinan, "· crianças e adolescentes"),
     nome_y = "Notificações",
     legenda = "none",
@@ -461,7 +460,7 @@ cena0
 ```
 :::
 ::: {.cena__caption}
-Fonte: Sinan/Ministério da Saúde, `r periodo_sinan`. Elaboração: DataSenado.
+Fonte: Sinan/Ministério da Saúde (VIOL_SEXU = 1; vítimas de 0 a 17 anos), `r periodo_sinan`. Elaboração: DataSenado.
 :::
 :::
 
@@ -471,7 +470,7 @@ Fonte: Sinan/Ministério da Saúde, `r periodo_sinan`. Elaboração: DataSenado.
 cena1 <- ca_ano |>
   grafico_linha(
     ano, n, grupo = ciclo_vida,
-    titulo = "Notificações envolvendo crianças e adolescentes",
+    titulo = "Violência sexual: crianças e adolescentes",
     subtitulo = paste("Brasil,", periodo_sinan),
     nome_y = "Notificações",
     legenda = "top",
@@ -484,7 +483,7 @@ cena1
 ```
 :::
 ::: {.cena__caption}
-Fonte: Sinan/Ministério da Saúde, `r periodo_sinan`. Elaboração: DataSenado.
+Fonte: Sinan/Ministério da Saúde (VIOL_SEXU = 1; vítimas de 0 a 17 anos), `r periodo_sinan`. Elaboração: DataSenado.
 :::
 :::
 
@@ -504,7 +503,7 @@ ca |>
 ```
 :::
 ::: {.cena__caption}
-Motivos detalhados em `r fmt_pct(1 - pct_sem_detalhe)` das notificações de crianças e adolescentes. Fonte: Sinan/Ministério da Saúde. Elaboração: DataSenado.
+Motivos detalhados em `r fmt_pct(1 - pct_sem_detalhe)` das notificações de crianças e adolescentes. Fonte: Sinan/Ministério da Saúde (VIOL_SEXU = 1; vítimas de 0 a 17 anos). Elaboração: DataSenado.
 :::
 :::
 
@@ -549,7 +548,7 @@ barras_cores(
 ```
 :::
 ::: {.cena__caption}
-Fonte: Sinan/Ministério da Saúde. Registros sem informação do autor excluídos. Elaboração: DataSenado.
+Fonte: Sinan/Ministério da Saúde (VIOL_SEXU = 1; vítimas de 0 a 17 anos). Registros sem informação do autor excluídos. Elaboração: DataSenado.
 :::
 :::
 
@@ -571,7 +570,7 @@ ca |>
 ```
 :::
 ::: {.cena__caption}
-Fonte: Sinan/Ministério da Saúde, `r periodo_sinan`. Escala de cores em logaritmo. Elaboração: DataSenado.
+Fonte: Sinan/Ministério da Saúde (VIOL_SEXU = 1; vítimas de 0 a 17 anos), `r periodo_sinan`. Escala de cores em logaritmo. Elaboração: DataSenado.
 :::
 :::
 
@@ -588,7 +587,7 @@ barras_cores(
 ```
 :::
 ::: {.cena__caption}
-Fonte: Sinan/Ministério da Saúde, `r periodo_sinan`. Sexo registrado na ficha de notificação. Elaboração: DataSenado.
+Fonte: Sinan/Ministério da Saúde (VIOL_SEXU = 1; vítimas de 0 a 17 anos), `r periodo_sinan`. Sexo registrado na ficha de notificação. Elaboração: DataSenado.
 :::
 :::
 
@@ -706,7 +705,7 @@ cnj_graf <- cnj_ano |> filter(ano >= ano_cnj_inicial, ano <= ano_cnj_completo)
 cena9 <- cnj_graf |>
   grafico_linha(
     ano, n,
-    titulo = "Processos ajuizados na Justiça estadual de 1º grau",
+    titulo = "Processos ajuizados na Justiça estadual",
     subtitulo = paste0("Temas ligados a crianças e adolescentes · ", min(cnj_graf$ano), "–", max(cnj_graf$ano)),
     nome_y = "Processos",
     legenda = "none",
@@ -733,7 +732,7 @@ cena9
 ```
 :::
 ::: {.cena__caption}
-Fonte: CNJ, dados públicos da Justiça estadual de 1º grau, `r min(cnj_graf$ano)`–`r max(cnj_graf$ano)` (anos completos). Elaboração: DataSenado.
+Fonte: CNJ, dados públicos da Justiça estadual, `r min(cnj_graf$ano)`–`r max(cnj_graf$ano)` (anos completos). Elaboração: DataSenado.
 :::
 :::
 
@@ -769,7 +768,7 @@ full_join(processos_mes, notificacoes_mes, by = "mes") |>
   filter(!is.na(n)) |>
   grafico_linha(
     mes, n, grupo = serie,
-    titulo = "Processos ajuizados e notificações de violência",
+    titulo = "Processos (ECA) e notificações de violência sexual",
     subtitulo = "Brasil · série mensal",
     nome_y = "Nº de registros",
     cores = c(Processos = "#6588B1", Notificações = "#FF481F"),
@@ -913,7 +912,7 @@ Fonte: IBGE, Pesquisa MUNIC 2023, e Censo Demográfico 2022. Elaboração: DataS
 
 ## O que os dados nos dizem
 
-* A tabela SINAN reúne **`r fmt_int(tot_ca)` notificações** envolvendo crianças e adolescentes; **`r fmt_pct(tot_criancas/tot_ca)`** se referem a crianças de 0 a 11 anos.
+* A tabela SINAN reúne **`r fmt_int(tot_ca)` notificações de violência sexual** envolvendo crianças e adolescentes; **`r fmt_pct(tot_criancas/tot_ca)`** se referem a crianças de 0 a 11 anos.
 * Um único vínculo familiar está assinalado em **`r fmt_pct(n_familiares/tot_ca)`** das notificações desses grupos. As múltiplas relações são preservadas em categoria própria.
 * Nos registros de violência sexual do SIA, o pico entre meninas está aos **`r sia_pico$idade` anos**. No SIH, a mediana ponderada é de **`r mediana_sih` anos**.
 * **Saúde e Justiça oferecem perspectivas distintas**. Suas séries não permitem vincular diretamente notificações a processos.
@@ -921,7 +920,7 @@ Fonte: IBGE, Pesquisa MUNIC 2023, e Censo Demográfico 2022. Elaboração: DataS
 
 
 ::: {.fontes}
-**Fontes e metodologia.** Sinan/Ministério da Saúde (`r periodo_sinan`); SIA/SUS (`r periodo_sia`); SIH/SUS (`r periodo_sih`); CNJ, dados públicos da Justiça estadual de 1º grau (`r periodo_cnj`); IBGE, Pesquisa MUNIC 2023 e Censo Demográfico 2022. As tabelas de saúde são agregadas e suas frequências são calculadas pela soma de **n**. SIA e SIH selecionam diagnósticos T742 ou Y05 e idades de 0 a 17 anos; o Sinan reúne notificações de violência interpessoal e autoprovocada com vítimas de 0 a 17 anos. As características dos autores são preservadas independentemente de sua faixa etária. Crianças têm menos de 12 anos; adolescentes, de 12 a 17. A mediana de idade do SIH é ponderada por n. Os registros não representam necessariamente pessoas únicas. A comparação anual de SIA, SIH e CNJ exclui os anos nas extremidades quando os registros disponíveis não começam em janeiro ou não terminam em dezembro. No Sinan, `r fmt_pct(pct_sem_detalhe)` das notificações de crianças e adolescentes têm motivação ausente ou agrupada como não detalhada. Na MUNIC, valores zero incluem respostas convertidas de "não informou"; não permitem identificar isoladamente municípios sem conselho.
+**Fontes e metodologia.** Sinan/Ministério da Saúde (`r periodo_sinan`); SIA/SUS (`r periodo_sia`); SIH/SUS (`r periodo_sih`); CNJ, dados públicos da Justiça estadual (`r periodo_cnj`); IBGE, Pesquisa MUNIC 2023 e Censo Demográfico 2022. As tabelas de saúde são agregadas e suas frequências são calculadas pela soma de **n**. SIA e SIH selecionam diagnósticos T742 ou Y05 e idades de 0 a 17 anos; o Sinan seleciona somente notificações com **VIOL_SEXU = 1 (Sim)** e vítimas de 0 a 17 anos. O CNJ reúne processos com assuntos relacionados ao ECA, em diferentes graus, sem filtro exclusivo de violência sexual. As características dos autores são preservadas independentemente de sua faixa etária. Crianças têm menos de 12 anos; adolescentes, de 12 a 17. A mediana de idade do SIH é ponderada por n. Os registros não representam necessariamente pessoas únicas. A comparação anual de SIA, SIH e CNJ exclui os anos nas extremidades quando os registros disponíveis não começam em janeiro ou não terminam em dezembro. No Sinan, `r fmt_pct(pct_sem_detalhe)` das notificações de crianças e adolescentes têm motivação ausente ou agrupada como não detalhada. Na MUNIC, valores zero incluem respostas convertidas de "não informou"; não permitem identificar isoladamente municípios sem conselho.
 :::
 
 :::

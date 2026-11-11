@@ -1,0 +1,8 @@
+"fonte","linhas","variaveis","volume","unidade","data_minima","data_maxima"
+"SIA",17155,5,239331,"Registros de produção ambulatorial","2008-01-01","2026-08-01"
+"SIH",4475,5,5834,"Registros hospitalares","2007-12-01","2026-08-01"
+"SINAN",221537,9,430989,"Notificações de violência sexual","2009-01-01","2024-12-01"
+"CNJ",465950,24,442001,"Processos distintos","2008-01-02","2026-08-12"
+"MUNIC",5570,11,5570,"Municípios","2023 (ano de referência)","2023 (ano de referência)"
+"Taxa_SIA",5571,10,5571,"Municípios","2025-09-01","2026-08-31"
+"Taxa_SIH",5571,10,5571,"Municípios","2025-09-01","2026-08-31"
