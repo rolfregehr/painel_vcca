@@ -99,7 +99,6 @@ populacao_minima_municipio <- 20000L
 
 ```{r card_viol_total}
 #| content: valuebox
-#| title: "Nº total violência sexual"
 #| cache: false
 
 load("tabelas/viol_sexual_ca_sia_pa.rda")
@@ -495,7 +494,6 @@ ranking_taxa_municipal(taxa_hospitalar_municipio, maiores = FALSE,
 
 
 ```{r Motivos, cache=FALSE}
-#| title: Motivos
 
 
 library(tidyverse)
@@ -562,7 +560,6 @@ sinan |>
 ### Agressores
 
 ```{r Agressores, cache=FALSE}
-#| title: Agressores
 
 # um gráfico individual por autor, dispostos em grade que ocupa o cartão
 autores_ord <- sinan |>
@@ -593,7 +590,6 @@ grade_paineis(graficos_autor, colunas = 5)
 ### Agressores x Vítimas
 
 ```{r Agressores x Vítimas}
-#| title: Agressores e vítimas
 
 dados_heatmap <- sinan |>
   mutate(
@@ -621,7 +617,6 @@ htmltools::div(
 
 ### Autor x Vítima x Causa
 ```{r principais cruzamentos}
-#| title: Autor x Vítima x Causa
 
 pacman::p_load(dplyr, gtExtras, gt, scales)
 
@@ -686,7 +681,6 @@ sinan |>
 
 ### Autor x Vítima x Gênero
 ```{r principais cruzamentos - gênero}
-#| title: Autor x Vítima x Gênero
 
 ordem <- sinan |> 
   filter(ciclo_vida %in% c("Criança", "Adolescente")) |> 
@@ -893,7 +887,6 @@ cat(knitr::knit_child(text = c(
 
 
 ```{r coropletico_conselhos_tutelares, cache=FALSE}
-#| title: "Conselhos tutelares: ano base 2023 - fonte: IBGE"
 
 # Dados --------------------------------------------------------------------
 
