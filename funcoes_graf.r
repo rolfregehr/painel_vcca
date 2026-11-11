@@ -358,7 +358,8 @@ grafico_heatmap <- function(
     titulo = NULL,
     nome_x = NULL,
     nome_y = NULL,
-    altura = "100%"
+    altura = "100%",
+    tamanho_fonte = 12
 ) {
   dados <- dados |>
     dplyr::transmute(
@@ -390,12 +391,12 @@ grafico_heatmap <- function(
   )
 
   widget_echarts(list(
-    textStyle = list(fontFamily = fonte_senado, fontSize = 12),
+    textStyle = list(fontFamily = fonte_senado, fontSize = tamanho_fonte),
     title = list(
       text = titulo,
       left = "center",
       top = 4,
-      textStyle = list(fontSize = 14)
+      textStyle = list(fontSize = tamanho_fonte + 2)
     ),
     grid = list(
       left = 14,
@@ -408,19 +409,23 @@ grafico_heatmap <- function(
       type = "category",
       data = as.list(xs),
       name = nome_x,
+      nameTextStyle = list(fontSize = tamanho_fonte),
       nameLocation = "middle",
       nameGap = 66,
-      axisLabel = list(rotate = 40, interval = 0),
+      axisLabel = list(rotate = 40, interval = 0, fontSize = tamanho_fonte),
       axisTick = list(show = FALSE)
     ),
     yAxis = list(
       type = "category",
       data = as.list(ys),
       name = nome_y,
+      nameTextStyle = list(fontSize = tamanho_fonte),
+      axisLabel = list(fontSize = tamanho_fonte),
       axisTick = list(show = FALSE)
     ),
     tooltip = list(formatter = htmlwidgets::JS(fmt_tooltip)),
     visualMap = list(
+      textStyle = list(fontSize = tamanho_fonte),
       min = 0,
       max = max(log1p(dados$.n)),
       dimension = 3,
@@ -441,7 +446,7 @@ grafico_heatmap <- function(
       itemStyle = list(borderColor = "white", borderWidth = 1.5),
       label = list(
         show = TRUE,
-        fontSize = 11,
+        fontSize = tamanho_fonte - 1,
         color = "#333333",
         formatter = htmlwidgets::JS(
           "function(p){return Number(p.value[2]).toLocaleString('pt-BR');}"

@@ -603,26 +603,19 @@ dados_heatmap <- sinan |>
   group_by(ciclo_vida, ciclo_vida_autor) |>
   summarise(n = sum(n, na.rm = TRUE), .groups = "drop")
 
-grade_paineis(list(
+htmltools::div(
+  class = "heatmap-autores-vitimas",
   grafico_heatmap(
-    dados_heatmap,
+    dados_heatmap |> filter(ciclo_vida %in% c("Adolescente", "Criança")),
     eixo_x = ciclo_vida_autor,
     eixo_y = ciclo_vida,
     valores = n,
-    titulo = "Distribuição segundo o ciclo de vida e o ciclo de vida do autor",
+    titulo = "Crianças e adolescentes × provável autor",
     nome_x = "Ciclo de vida do autor",
-    nome_y = "Ciclo de vida"
-  ),
-  grafico_heatmap(
-    dados_heatmap |> filter(ciclo_vida %in% c('Adolescente', 'Criança')),
-    eixo_x = ciclo_vida_autor,
-    eixo_y = ciclo_vida,
-    valores = n,
-    titulo = "Distribuição criança/adolescente e o ciclo de vida do autor",
-    nome_x = "Ciclo de vida do autor",
-    nome_y = "Ciclo de vida"
+    nome_y = "Ciclo de vida da vítima",
+    tamanho_fonte = 15
   )
-), colunas = 1)
+)
 
 ```
 
@@ -1092,7 +1085,7 @@ htmltools::div(
 
 ```
 
-# Fontes e metodologia
+# Fontes / método
 
 ```{r fontes-iframe}
 #| title: "Sobre os dados utilizados"
