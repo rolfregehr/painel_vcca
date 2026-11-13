@@ -105,10 +105,14 @@ load("tabelas/viol_sexual_ca_sia_pa.rda")
 
 viol_sexual_ca_sia_pa <- viol_sexual_ca_sia_pa |> 
   filter(competencia >= ym("201501"))
+
+ano_inicio <- min(year(viol_sexual_ca_sia_pa$competencia))
+ano_final <- max(year(viol_sexual_ca_sia_pa$competencia))
          
 n_total <- format(sum(viol_sexual_ca_sia_pa$n), big.mark = '.', decimal.mark = ',' )
 
 list(
+  title = paste0("Nº de ocorrências - ", ano_inicio, " a ", ano_final),
   icon = "bandaid-fill",
   color = "danger",
   value = format(n_total, big.mark = ".", decimal.mark = ",")
